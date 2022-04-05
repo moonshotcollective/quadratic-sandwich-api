@@ -4,7 +4,6 @@ go 1.17
 
 require (
 	github.com/gofiber/fiber/v2 v2.23.0
-	github.com/hansmrtn/pay-party-api v1.0.1
 	github.com/joho/godotenv v1.4.0
 	go.mongodb.org/mongo-driver v1.8.1
 )

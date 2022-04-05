@@ -19,7 +19,8 @@ type MongoInstance struct {
 }
 
 var mongoURI string
-var dbCollection string
+var projectCollection string
+var ballotCollection string
 var dbName string
 var apiVersion string
 
@@ -32,7 +33,8 @@ func init() {
 	}
 	// Get env variables
 	mongoURI = os.Getenv("DATABASE_URL")
-	dbCollection = os.Getenv("DATABASE_COLLECTION")
+	projectCollection = os.Getenv("PROJECT_COLLECTION")
+	ballotCollection = os.Getenv("BALLOT_COLLECTION")
 	dbName = os.Getenv("DATABASE_NAME")
 	apiVersion = os.Getenv("API_VERSION")
 
@@ -64,6 +66,9 @@ func RouteProjects(app *fiber.App) *fiber.App {
 	app.Get("/projects/:id", GetProject)
 	app.Post("/projects/new", NewProject)
 	app.Delete("/projects/rm/:id", DeleteProject)
+
+	app.Get("/ballots", GetBallots)
+	app.Post("/ballots/cast", CastBallot)
 
 	return app
 }
