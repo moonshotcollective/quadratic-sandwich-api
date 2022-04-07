@@ -11,6 +11,7 @@ func ApiRoutes(api fiber.Router) {
 	public := api.Group("/")
 	public.Get("/projects", controllers.GetProjects)
 	public.Get("/projects/:id", controllers.GetProject)
+	// TODO: Move ballots
 	public.Get("/ballots", controllers.GetBallots)
 
 }

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"math/big"
 	"os"
 
@@ -82,6 +81,5 @@ func HolderAuth(account, signature string) bool {
 		panic(err)
 	}
 
-	fmt.Println(res["0"].(*big.Int).Cmp(big.NewInt(1)) == 0)
 	return VerifySignature(account, signature, []byte("Example `personal_sign` message")) && res["0"].(*big.Int).Cmp(big.NewInt(1)) == 0
 }
