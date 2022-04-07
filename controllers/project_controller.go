@@ -1,4 +1,4 @@
-package server
+package controllers
 
 import (
 	"log"
@@ -45,7 +45,8 @@ func GetProject(ctx *fiber.Ctx) error {
 	return ctx.Status(200).JSON(project)
 }
 
-func NewProject(ctx *fiber.Ctx) error {
+func NewProjects(ctx *fiber.Ctx) error {
+
 	collection := mg.DB.Collection(projectCollection)
 	projects := new([]models.Project) // Expects JSON blob of array Project-like objects
 	if err := ctx.BodyParser(&projects); err != nil {
@@ -85,39 +86,4 @@ func DeleteProject(ctx *fiber.Ctx) error {
 	}
 	// the record was deleted
 	return ctx.SendStatus(204)
-}
-
-func GetBallots(ctx *fiber.Ctx) error {
-	query := bson.D{{}}
-	cursor, err := mg.DB.Collection(ballotCollection).Find(ctx.Context(), query)
-	if err != nil {
-		log.Fatal(err.Error())
-		return ctx.Status(500).SendString(err.Error())
-	}
-	var ballots []models.Ballot = make([]models.Ballot, 0)
-	// iterate the cursor and decode each item into a party
-	if err := cursor.All(ctx.Context(), &ballots); err != nil {
-		return ctx.Status(500).SendString(err.Error())
-	}
-	return ctx.JSON(ballots)
-}
-
-func CastBallot(ctx *fiber.Ctx) error {
-	collection := mg.DB.Collection(ballotCollection)
-	ballot := new(models.Ballot) // Expects JSON blob of array ballot-like objects
-	if err := ctx.BodyParser(&ballot); err != nil {
-		return ctx.Status(400).SendString(err.Error())
-	}
-	ballot.ID = ""
-	ballot.Version = apiVersion
-	insertRes, err := collection.InsertOne(ctx.Context(), ballot)
-	if err != nil {
-		return ctx.Status(500).SendString(err.Error())
-	}
-	filter := bson.D{{Key: "_id", Value: insertRes.InsertedID}}
-	createdRecord := collection.FindOne(ctx.Context(), filter)
-	createdProject := &models.Project{}
-	createdRecord.Decode(createdProject)
-	// }
-	return ctx.Status(200).SendString("Success")
 }
