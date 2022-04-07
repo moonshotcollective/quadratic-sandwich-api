@@ -35,7 +35,6 @@ func init() {
 	ballotCollection = os.Getenv("BALLOT_COLLECTION")
 	dbName = os.Getenv("DATABASE_NAME")
 	apiVersion = os.Getenv("API_VERSION")
-	// rpc_endpoint = os.Getenv("RPC_ENDPOINT")
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
 	if err != nil {
