@@ -3,7 +3,6 @@ module quadratic-sandwich-api
 go 1.17
 
 // +heroku goVersion go1.17.0
-// +heroku install ./...
 
 require (
 	github.com/ethereum/go-ethereum v1.10.17
