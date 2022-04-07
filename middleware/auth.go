@@ -14,11 +14,13 @@ import (
 )
 
 var rpc_endpoint = os.Getenv("RPC_ENDPOINT")
+var contract_address = os.Getenv("CONTRACT_ADDRESS")
+var sign_message = os.Getenv("SIGN_MESSAGE")
 
-func VerifySignature(from, sigHex string, msg []byte) bool {
+func VerifySignature(from, sigHex string) bool {
 	sig := hexutil.MustDecode(sigHex)
 
-	msg = accounts.TextHash(msg)
+	msg := accounts.TextHash([]byte(sign_message))
 	sig[crypto.RecoveryIDOffset] -= 27 // Transform yellow paper V from 27/28 to 0/1
 
 	recovered, err := crypto.SigToPub(msg, sig)
@@ -41,7 +43,7 @@ func OpAuth(account, signature string) bool {
 		panic(err)
 	}
 
-	addr := ethgo.HexToAddress("0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512")
+	addr := ethgo.HexToAddress(contract_address)
 
 	client, err := jsonrpc.NewClient(rpc_endpoint)
 	if err != nil {
@@ -54,7 +56,7 @@ func OpAuth(account, signature string) bool {
 		panic(err)
 	}
 
-	return VerifySignature(account, signature, []byte("Example `personal_sign` message")) && res["0"].(bool)
+	return VerifySignature(account, signature) && res["0"].(bool)
 }
 
 func HolderAuth(account, signature string) bool {
@@ -68,7 +70,7 @@ func HolderAuth(account, signature string) bool {
 		panic(err)
 	}
 
-	addr := ethgo.HexToAddress("0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512")
+	addr := ethgo.HexToAddress(contract_address)
 
 	client, err := jsonrpc.NewClient(rpc_endpoint)
 	if err != nil {
@@ -81,5 +83,5 @@ func HolderAuth(account, signature string) bool {
 		panic(err)
 	}
 
-	return VerifySignature(account, signature, []byte("Example `personal_sign` message")) && res["0"].(*big.Int).Cmp(big.NewInt(1)) == 0
+	return VerifySignature(account, signature) && res["0"].(*big.Int).Cmp(big.NewInt(1)) == 0
 }
