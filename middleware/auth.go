@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"math/big"
 	"os"
 
@@ -17,10 +18,13 @@ var rpc_endpoint = os.Getenv("RPC_ENDPOINT")
 var contract_address = os.Getenv("CONTRACT_ADDRESS")
 var sign_message = os.Getenv("SIGN_MESSAGE")
 
-func VerifySignature(from, sigHex string) bool {
+func VerifySig(message []byte, from, sigHex string) bool {
 	sig := hexutil.MustDecode(sigHex)
+	fmt.Println(sigHex)
+	fmt.Println(sig)
 
-	msg := accounts.TextHash([]byte(sign_message))
+	msg := accounts.TextHash(message)
+	fmt.Println(msg)
 	sig[crypto.RecoveryIDOffset] -= 27 // Transform yellow paper V from 27/28 to 0/1
 
 	recovered, err := crypto.SigToPub(msg, sig)
@@ -29,6 +33,8 @@ func VerifySignature(from, sigHex string) bool {
 	}
 
 	recoveredAddr := crypto.PubkeyToAddress(*recovered)
+	fmt.Println(recoveredAddr.Hex())
+	fmt.Println(from)
 
 	return from == recoveredAddr.Hex()
 }
@@ -56,7 +62,13 @@ func OpAuth(account, signature string) bool {
 		panic(err)
 	}
 
-	return VerifySignature(account, signature) && res["0"].(bool)
+	// nonce, err := client.Eth().GetNonce(addr, ethgo.Latest)
+	// fmt.Println(crypto.Keccak256([]byte("1")))
+
+	// message := []byte("1")
+
+	// return VerifySig([]byte("1"), account, signature) && res["0"].(bool)
+	return res["0"].(bool)
 }
 
 func HolderAuth(account, signature string) bool {
@@ -83,5 +95,9 @@ func HolderAuth(account, signature string) bool {
 		panic(err)
 	}
 
-	return VerifySignature(account, signature) && res["0"].(*big.Int).Cmp(big.NewInt(1)) == 0
+	// nonce, err := client.Eth().GetNonce(addr, ethgo.Latest)
+
+	// message := crypto.Keccak256Hash([]byte(strconv.FormatUint(nonce, 18))).Bytes()
+	// return VerifySig(message, account, signature) && res["0"].(*big.Int).Cmp(big.NewInt(1)) == 0
+	return res["0"].(*big.Int).Cmp(big.NewInt(1)) == 0
 }

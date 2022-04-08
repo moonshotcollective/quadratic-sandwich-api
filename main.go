@@ -19,6 +19,7 @@ func main() {
 	app.Use(cors.New())
 	// Rate Limit
 	app.Use(limiter.New())
+	// Logger
 	app.Use(logger.New())
 
 	// Initialize api endpoint
