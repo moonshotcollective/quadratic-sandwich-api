@@ -36,6 +36,7 @@ github.com/gofiber/fiber/v2
 github.com/gofiber/fiber/v2/internal/bytebufferpool
 github.com/gofiber/fiber/v2/internal/colorable
 github.com/gofiber/fiber/v2/internal/dictpool
+github.com/gofiber/fiber/v2/internal/fasttemplate
 github.com/gofiber/fiber/v2/internal/fwd
 github.com/gofiber/fiber/v2/internal/go-json
 github.com/gofiber/fiber/v2/internal/go-json/decoder
@@ -54,6 +55,7 @@ github.com/gofiber/fiber/v2/internal/uuid
 github.com/gofiber/fiber/v2/middleware/basicauth
 github.com/gofiber/fiber/v2/middleware/cors
 github.com/gofiber/fiber/v2/middleware/limiter
+github.com/gofiber/fiber/v2/middleware/logger
 github.com/gofiber/fiber/v2/utils
 # github.com/golang/snappy v0.0.4
 ## explicit
