@@ -1,14 +1,14 @@
 module quadratic-sandwich-api
 
-go 1.17
+go 1.15
 
-// +heroku goVersion go1.17.0
+// +heroku goVersion go1.15.0
 
 require (
 	github.com/ethereum/go-ethereum v1.10.17
 	github.com/gofiber/fiber/v2 v2.31.0
 	github.com/gofiber/jwt/v3 v3.2.10
-	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.1
 	github.com/joho/godotenv v1.4.0
 	github.com/umbracle/ethgo v0.1.0
