@@ -21,6 +21,7 @@ var projectCollection string
 var ballotCollection string
 var dbName string
 var apiVersion string
+var signatrue_secret string
 
 var mg MongoInstance
 
@@ -35,6 +36,7 @@ func init() {
 	ballotCollection = os.Getenv("BALLOT_COLLECTION")
 	dbName = os.Getenv("DATABASE_NAME")
 	apiVersion = os.Getenv("API_VERSION")
+	signatrue_secret = os.Getenv("SIGNATURE_SECRET")
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
 	if err != nil {

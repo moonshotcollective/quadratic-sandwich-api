@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	jwtware "github.com/gofiber/jwt/v3"
 	"github.com/golang-jwt/jwt/v4"
@@ -20,7 +21,7 @@ func main() {
 	// TODO: Configure CORS
 	app.Use(cors.New())
 	// Rate Limit
-	// app.Use(limiter.New())
+	app.Use(limiter.New())
 	// Logger
 	app.Use(logger.New())
 
@@ -28,7 +29,7 @@ func main() {
 
 	// JWT Middleware
 	app.Use(jwtware.New(jwtware.Config{
-		SigningKey: []byte("secret"),
+		SigningKey: []byte(os.Getenv("SIGNATURE_SECRET")),
 	}))
 
 	app.Get("/restricted", restricted)

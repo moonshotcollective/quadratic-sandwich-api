@@ -50,54 +50,74 @@ func GetProject(ctx *fiber.Ctx) error {
 
 func NewProjects(ctx *fiber.Ctx) error {
 
-	// fmt.Println(ctx.Locals("account").(*jwt.Token))
-	// fmt.Println(ctx.Locals("jwt").(*jwt.Token))
-
 	auth := strings.ReplaceAll(ctx.GetReqHeaders()["Authorization"], "Bearer ", "")
 	fmt.Println(auth)
 	token, err := jwt.Parse(auth, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-		return []byte("secret"), nil
+		return []byte(signatrue_secret), nil
 	})
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// fmt.Println(token.Claims("account"))
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		fmt.Println(claims["account"], claims["signature"], claims["role"])
+		if claims["role"] != "op" {
+			return ctx.SendStatus(401)
+		}
 	} else {
 		fmt.Println(err)
 	}
 
-	// collection := mg.DB.Collection(projectCollection)
-	// projects := new([]models.Project) // Expects JSON blob of array Project-like objects
-	// if err := ctx.BodyParser(&projects); err != nil {
-	// 	return ctx.Status(400).SendString(err.Error())
-	// }
-	// for _, project := range *projects {
-	// 	project.ID = ""
-	// 	project.Version = apiVersion
-	// 	insertRes, err := collection.InsertOne(ctx.Context(), project)
-	// 	if err != nil {
-	// 		return ctx.Status(500).SendString(err.Error())
-	// 	}
-	// 	filter := bson.D{{Key: "_id", Value: insertRes.InsertedID}}
-	// 	createdRecord := collection.FindOne(ctx.Context(), filter)
-	// 	createdProject := &models.Project{}
-	// 	createdRecord.Decode(createdProject)
-	// }
+	collection := mg.DB.Collection(projectCollection)
+	projects := new([]models.Project) // Expects JSON blob of array Project-like objects
+	if err := ctx.BodyParser(&projects); err != nil {
+		return ctx.Status(400).SendString(err.Error())
+	}
+	for _, project := range *projects {
+		project.ID = ""
+		project.Version = apiVersion
+		insertRes, err := collection.InsertOne(ctx.Context(), project)
+		if err != nil {
+			return ctx.Status(500).SendString(err.Error())
+		}
+		filter := bson.D{{Key: "_id", Value: insertRes.InsertedID}}
+		createdRecord := collection.FindOne(ctx.Context(), filter)
+		createdProject := &models.Project{}
+		createdRecord.Decode(createdProject)
+	}
 	return ctx.Status(200).SendString("Success")
 }
 
 // Docs: https://docs.mongodb.com/manual/reference/command/delete/
 func DeleteProject(ctx *fiber.Ctx) error {
+
+	auth := strings.ReplaceAll(ctx.GetReqHeaders()["Authorization"], "Bearer ", "")
+	fmt.Println(auth)
+	token, err := jwt.Parse(auth, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return []byte(signatrue_secret), nil
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		if claims["role"] != "op" {
+			return ctx.SendStatus(401)
+		}
+	} else {
+		fmt.Println(err)
+	}
 	id, err := primitive.ObjectIDFromHex(
 		ctx.Params("id"),
 	)
