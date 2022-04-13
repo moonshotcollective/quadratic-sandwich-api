@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/umbracle/ethgo"
 	"github.com/umbracle/ethgo/abi"
 	"github.com/umbracle/ethgo/contract"
@@ -100,4 +103,59 @@ func HolderAuth(account, signature string) bool {
 	// message := crypto.Keccak256Hash([]byte(strconv.FormatUint(nonce, 18))).Bytes()
 	// return VerifySig(message, account, signature) && res["0"].(*big.Int).Cmp(big.NewInt(1)) == 0
 	return res["0"].(*big.Int).Cmp(big.NewInt(1)) == 0
+}
+
+func Login(c *fiber.Ctx) error {
+	account := c.FormValue("account")
+	signature := c.FormValue("signature")
+
+	msg := "sign in with:\n" + account
+	// // Throws Unauthorized error
+	if !VerifySig([]byte(msg), account, signature) {
+		return c.SendStatus(fiber.StatusUnauthorized)
+	}
+
+	// Create the Claims
+	claims := jwt.MapClaims{
+		"account":   account,
+		"signature": signature,
+		"role":      "public",
+		"exp":       time.Now().Add(time.Hour).Unix(),
+	}
+
+	// Create token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	// cookie := new(fiber.Cookie)
+	// cookie.Name = "jwt-session"
+	// cookie.Value = t
+	// cookie.Expires = time.Now().Add(24 * time.Hour)
+
+	// // Set cookie
+	// c.Cookie(cookie)
+
+	fmt.Println(t)
+
+	cookie := fiber.Cookie{
+		Name:     "access_token",
+		Value:    t,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HTTPOnly: true,
+		Secure:   true,
+	}
+
+	c.Cookie(&cookie)
+
+	return c.JSON(fiber.Map{
+		"access_token": t,
+		// "refresh_token": tokens["refresh_token"],
+		"token_type": "bearer",
+	})
+
+	// return c.JSON(fiber.Map{"token": t})
 }

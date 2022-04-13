@@ -48,15 +48,21 @@ github.com/gofiber/fiber/v2/internal/go-json/encoder/vm_indent
 github.com/gofiber/fiber/v2/internal/go-json/errors
 github.com/gofiber/fiber/v2/internal/go-json/runtime
 github.com/gofiber/fiber/v2/internal/isatty
-github.com/gofiber/fiber/v2/internal/memory
 github.com/gofiber/fiber/v2/internal/msgp
 github.com/gofiber/fiber/v2/internal/schema
 github.com/gofiber/fiber/v2/internal/uuid
-github.com/gofiber/fiber/v2/middleware/basicauth
 github.com/gofiber/fiber/v2/middleware/cors
-github.com/gofiber/fiber/v2/middleware/limiter
 github.com/gofiber/fiber/v2/middleware/logger
 github.com/gofiber/fiber/v2/utils
+# github.com/gofiber/jwt/v3 v3.2.10
+## explicit; go 1.15
+github.com/gofiber/jwt/v3
+# github.com/golang-jwt/jwt v3.2.2+incompatible
+## explicit
+github.com/golang-jwt/jwt
+# github.com/golang-jwt/jwt/v4 v4.4.1
+## explicit; go 1.16
+github.com/golang-jwt/jwt/v4
 # github.com/golang/snappy v0.0.4
 ## explicit
 github.com/golang/snappy
@@ -70,7 +76,7 @@ github.com/gorilla/websocket
 # github.com/joho/godotenv v1.4.0
 ## explicit; go 1.12
 github.com/joho/godotenv
-# github.com/klauspost/compress v1.15.0
+# github.com/klauspost/compress v1.15.1
 ## explicit; go 1.15
 github.com/klauspost/compress
 github.com/klauspost/compress/flate
@@ -101,8 +107,8 @@ github.com/umbracle/fastrlp
 # github.com/valyala/bytebufferpool v1.0.0
 ## explicit
 github.com/valyala/bytebufferpool
-# github.com/valyala/fasthttp v1.34.0
-## explicit; go 1.12
+# github.com/valyala/fasthttp v1.35.0
+## explicit; go 1.15
 github.com/valyala/fasthttp
 github.com/valyala/fasthttp/fasthttputil
 github.com/valyala/fasthttp/reuseport
@@ -170,7 +176,7 @@ golang.org/x/crypto/sha3
 # golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 ## explicit
 golang.org/x/sync/errgroup
-# golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9
+# golang.org/x/sys v0.0.0-20220412071739-889880a91fd5
 ## explicit; go 1.17
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader
