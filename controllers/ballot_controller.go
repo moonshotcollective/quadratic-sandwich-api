@@ -28,7 +28,6 @@ func GetBallots(ctx *fiber.Ctx) error {
 }
 
 func CastBallot(ctx *fiber.Ctx) error {
-
 	// JWT validation for holder authorization
 	auth := strings.ReplaceAll(ctx.GetReqHeaders()["Authorization"], "Bearer ", "")
 	token, err := jwt.Parse(auth, func(token *jwt.Token) (interface{}, error) {

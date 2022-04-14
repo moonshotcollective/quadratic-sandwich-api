@@ -8,7 +8,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	jwtware "github.com/gofiber/jwt/v3"
 )
@@ -20,7 +19,7 @@ func main() {
 	// TODO: Configure CORS
 	app.Use(cors.New())
 	// Rate Limit
-	app.Use(limiter.New())
+	// app.Use(limiter.New())
 	// Logger
 	app.Use(logger.New())
 	// Connect user

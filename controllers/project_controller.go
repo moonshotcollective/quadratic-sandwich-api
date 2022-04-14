@@ -49,9 +49,8 @@ func GetProject(ctx *fiber.Ctx) error {
 }
 
 func NewProjects(ctx *fiber.Ctx) error {
-
+	// JWT authorization OP
 	auth := strings.ReplaceAll(ctx.GetReqHeaders()["Authorization"], "Bearer ", "")
-	fmt.Println(auth)
 	token, err := jwt.Parse(auth, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -95,9 +94,8 @@ func NewProjects(ctx *fiber.Ctx) error {
 
 // Docs: https://docs.mongodb.com/manual/reference/command/delete/
 func DeleteProject(ctx *fiber.Ctx) error {
-
+	// JWT authorization OP
 	auth := strings.ReplaceAll(ctx.GetReqHeaders()["Authorization"], "Bearer ", "")
-	fmt.Println(auth)
 	token, err := jwt.Parse(auth, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -110,7 +108,6 @@ func DeleteProject(ctx *fiber.Ctx) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		if claims["role"] != "op" {
 			return ctx.SendStatus(401)
@@ -124,6 +121,7 @@ func DeleteProject(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.SendStatus(400)
 	}
+
 	// find and delete the party with the given ID
 	query := bson.D{{Key: "_id", Value: id}}
 	result, err := mg.DB.Collection(projectCollection).DeleteOne(ctx.Context(), &query)
