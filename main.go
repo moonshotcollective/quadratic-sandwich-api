@@ -11,7 +11,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	jwtware "github.com/gofiber/jwt/v3"
-	"github.com/golang-jwt/jwt/v4"
 )
 
 func main() {
@@ -24,17 +23,14 @@ func main() {
 	app.Use(limiter.New())
 	// Logger
 	app.Use(logger.New())
-
+	// Connect user
 	app.Post("/login", middleware.Login)
-
-	// JWT Middleware
+	// JWT
 	app.Use(jwtware.New(jwtware.Config{
 		SigningKey: []byte(os.Getenv("SIGNATURE_SECRET")),
 	}))
 
-	app.Get("/restricted", restricted)
-
-	// Initialize api endpoint
+	// Initialize api endpoints group
 	api := app.Group("/api")
 	// Set public api routes
 	routes.ApiRoutes(api)
@@ -49,11 +45,4 @@ func main() {
 		log.Fatal(err)
 	}
 
-}
-
-func restricted(c *fiber.Ctx) error {
-	user := c.Locals("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	name := claims["name"].(string)
-	return c.SendString("Welcome " + name)
 }
