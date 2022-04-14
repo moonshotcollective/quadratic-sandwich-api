@@ -6,8 +6,9 @@ type Project struct {
 	Title       string   `json:"project_title"`
 	Description string   `json:"project_description"`
 	Timestamp   string   `json:"timestamp"`
-	Meta        Metadata `json:"project_meta"`
-	Ballots     []Ballot `json:"project_ballots"`
+	Meta        Metadata `json:"project_meta"`    // DEPRECATE
+	Ballots     []Ballot `json:"project_ballots"` // DEPRECATE
+	Votes       int      `json:"votes"`
 }
 
 type Metadata struct {

@@ -12,5 +12,5 @@ type Ballot struct {
 
 type Vote struct {
 	ID    primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"` // omitempty to protect against zeroed _id insertion
-	Votes string             `json:"votes"`
+	Votes int                `json:"votes"`
 }
