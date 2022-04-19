@@ -54,18 +54,18 @@ func isOP(account string) bool {
 	}
 	abiContract, err := abi.NewABIFromList(functions)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	addr := ethgo.HexToAddress(contract_address)
 	client, err := jsonrpc.NewClient(rpc_endpoint)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	c := contract.NewContract(addr, abiContract, client)
 	res, err := c.Call("hasRole", ethgo.Latest, crypto.Keccak256Hash([]byte("OP_ROLE")), account)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	return res["0"].(bool)
