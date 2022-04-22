@@ -65,7 +65,7 @@ func NewProjects(ctx *fiber.Ctx) error {
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if claims["role"] != "op" {
+		if claims["role"] != "OP_ROLE" {
 			return ctx.SendStatus(401)
 		}
 	} else {
@@ -109,7 +109,7 @@ func DeleteProject(ctx *fiber.Ctx) error {
 		log.Fatal(err)
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if claims["role"] != "op" {
+		if claims["role"] != "OP_ROLE" {
 			return ctx.SendStatus(401)
 		}
 	} else {

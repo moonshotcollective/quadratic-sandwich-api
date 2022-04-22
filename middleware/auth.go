@@ -71,7 +71,30 @@ func isOP(account string) bool {
 	return res["0"].(bool)
 }
 
-func isHolder(account string) bool {
+func hasRole(account, role string) bool {
+	var functions = []string{
+		"function hasRole(bytes32 role, address account) public view virtual override returns (bool)",
+	}
+	abiContract, err := abi.NewABIFromList(functions)
+	if err != nil {
+		log.Fatal(err)
+	}
+	addr := ethgo.HexToAddress(contract_address)
+	client, err := jsonrpc.NewClient(rpc_endpoint)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c := contract.NewContract(addr, abiContract, client)
+	res, err := c.Call("hasRole", ethgo.Latest, crypto.Keccak256Hash([]byte(role)), account)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return res["0"].(bool)
+}
+
+func hasMinted(account string) bool {
 	var functions = []string{
 		"function balanceOf(address owner) view returns (uint256)",
 	}
@@ -104,19 +127,24 @@ func Login(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(fiber.StatusUnauthorized)
 	}
 	// Set Auth Role
-	// TODO: Add opco role
+	// NOTE: Can only be one role, and in this heirarchy!
 	var role = "public"
-	if isHolder(account) {
-		role = "holder"
+	if hasRole(account, "OP_ROLE") {
+		role = "OP_ROLE"
 	}
-	if isOP(account) {
-		role = "op"
+	if hasRole(account, "OPCO_ROLE") {
+		role = "OPCO_ROLE"
 	}
+	if hasRole(account, "OPCO_CITIZEN_ROLE") {
+		role = "OPCO_CITIZEN_ROLE"
+	}
+
 	// Create the Claims
 	claims := jwt.MapClaims{
 		"account":   account,
 		"signature": signature,
 		"role":      role,
+		"minted":    hasMinted(account),
 		"exp":       time.Now().Add(time.Hour).Unix(),
 	}
 	// Create token
