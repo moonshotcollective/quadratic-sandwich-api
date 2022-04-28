@@ -48,9 +48,9 @@ func VerifySig(message []byte, from, sigHex string) bool {
 	return from == recoveredAddr.Hex()
 }
 
-func isOP(account string) bool {
+func isOp(account string) bool {
 	var functions = []string{
-		"function hasRole(bytes32 role, address account) public view virtual override returns (bool)",
+		"function isOp(address account) public view returns (bool)",
 	}
 	abiContract, err := abi.NewABIFromList(functions)
 	if err != nil {
@@ -63,7 +63,7 @@ func isOP(account string) bool {
 	}
 
 	c := contract.NewContract(addr, abiContract, client)
-	res, err := c.Call("hasRole", ethgo.Latest, crypto.Keccak256Hash([]byte("OP_ROLE")), account)
+	res, err := c.Call("isOp", ethgo.Latest, account)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -71,9 +71,9 @@ func isOP(account string) bool {
 	return res["0"].(bool)
 }
 
-func hasRole(account, role string) bool {
+func isOpCo(account string) bool {
 	var functions = []string{
-		"function hasRole(bytes32 role, address account) public view virtual override returns (bool)",
+		"function isOpCo(address account) public view returns (bool)",
 	}
 	abiContract, err := abi.NewABIFromList(functions)
 	if err != nil {
@@ -86,7 +86,30 @@ func hasRole(account, role string) bool {
 	}
 
 	c := contract.NewContract(addr, abiContract, client)
-	res, err := c.Call("hasRole", ethgo.Latest, crypto.Keccak256Hash([]byte(role)), account)
+	res, err := c.Call("isOpCo", ethgo.Latest, account)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return res["0"].(bool)
+}
+
+func isCitizen(account string) bool {
+	var functions = []string{
+		"function isCitizen(address account) public view returns (bool)",
+	}
+	abiContract, err := abi.NewABIFromList(functions)
+	if err != nil {
+		log.Fatal(err)
+	}
+	addr := ethgo.HexToAddress(contract_address)
+	client, err := jsonrpc.NewClient(rpc_endpoint)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c := contract.NewContract(addr, abiContract, client)
+	res, err := c.Call("isCitizen", ethgo.Latest, account)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -129,13 +152,13 @@ func Login(ctx *fiber.Ctx) error {
 	// Set Auth Role
 	// NOTE: Can only be one role, and in this heirarchy!
 	var role = "public"
-	if hasRole(account, "OP_ROLE") {
+	if isOp(account) {
 		role = "OP_ROLE"
 	}
-	if hasRole(account, "OPCO_ROLE") {
+	if isOpCo(account) {
 		role = "OPCO_ROLE"
 	}
-	if hasRole(account, "OPCO_CITIZEN_ROLE") {
+	if isCitizen(account) {
 		role = "OPCO_CITIZEN_ROLE"
 	}
 
