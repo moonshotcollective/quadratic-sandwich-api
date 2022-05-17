@@ -42,7 +42,7 @@ func CastBallot(ctx *fiber.Ctx) error {
 		log.Fatal(err)
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if claims["role"] != "OPCO_CITIZEN_ROLE" || claims["minted"] == false {
+		if claims["role"] != "OPCO_CITIZEN_ROLE" || claims["minted"] == false || claims["isCitizen"] == false {
 			return ctx.SendStatus(401)
 		}
 	} else {

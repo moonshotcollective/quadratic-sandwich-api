@@ -151,6 +151,7 @@ func Login(ctx *fiber.Ctx) error {
 	}
 	// Set Auth Role
 	// NOTE: Can only be one role, and in this heirarchy!
+	// TODO: Deprecate in favor of more explicit claims (below)
 	var role = "public"
 	if isOp(account) {
 		role = "OP_ROLE"
@@ -167,8 +168,11 @@ func Login(ctx *fiber.Ctx) error {
 		"account":   account,
 		"signature": signature,
 		"role":      role,
+		"isOP":      isOp(account),
+		"isOPCo":    isOpCo(account),
+		"isCitizen": isCitizen(account),
 		"minted":    hasMinted(account),
-		"exp":       time.Now().Add(time.Hour).Unix(),
+		"exp":       time.Now().Add(time.Hour * 6).Unix(),
 	}
 	// Create token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
