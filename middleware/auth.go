@@ -144,7 +144,7 @@ func hasMinted(account string) bool {
 func Login(ctx *fiber.Ctx) error {
 	account := ctx.FormValue("account")
 	signature := ctx.FormValue("signature")
-	msg := "sign in with:\n" + account
+	msg := "Please sign this message to connect to the Optimism Collective."
 	// // Throws Unauthorized error
 	if !VerifySig([]byte(msg), account, signature) {
 		return ctx.SendStatus(fiber.StatusUnauthorized)
