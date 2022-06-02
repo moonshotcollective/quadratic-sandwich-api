@@ -7,13 +7,16 @@ mod repository;
 extern crate rocket;
 use rocket::{get, http::Status, serde::json::Json};
 
+//add imports below
+use api::citizen_api::{create_citizen, get_citizen};
+use repository::mongodb_repo::MongoRepo;
 
-#[get("/")]
-fn hello() -> Result<Json<String>, Status> {
-    Ok(Json(String::from("Yoooo")))
-}
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![hello])
+    let db = MongoRepo::init();
+    rocket::build()
+        .manage(db)
+        .mount("/", routes![create_citizen])
+        .mount("/", routes![get_citizen])
 }

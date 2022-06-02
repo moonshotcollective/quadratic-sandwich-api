@@ -3,8 +3,8 @@ extern crate dotenv;
 use dotenv::dotenv;
 
 use mongodb::{
-    bson::{extjson::de::Error}, 
-    results::{ InsertOneResult}, 
+    bson::{extjson::de::Error, oid::ObjectId, doc}, 
+    results::{ InsertOneResult }, 
     sync::{Client, Collection},
 };
 
@@ -34,5 +34,16 @@ impl MongoRepo {
         }; 
         let citizen = self.col.insert_one(new_doc, None).ok().expect("Error: creating citizen");
         Ok(citizen)
+    }
+
+    pub fn get_citizen(&self, id: &String) -> Result<Citizen, Error> {
+        let obj_id = ObjectId::parse_str(id).unwrap();
+        let filter = doc! {"_id": obj_id};
+        let user_detail = self
+            .col
+            .find_one(filter, None)
+            .ok()
+            .expect("Error getting user's detail");
+        Ok(user_detail.unwrap())
     }
 }
