@@ -1,13 +1,13 @@
 import { Application } from 'express';
-// import courseRouter from './CourseRoutes';
-// import lessonRouter from './LessonRoutes';
+import citizenRouter from './Citizen.routes';
+import loginRouter from './Login.routes';
 
 export default class Routes {
 
   constructor(app: Application) {
-    // course reoutes
-    // app.use('/api/courses', courseRouter);
-    // lesson routes
-    // app.use('/api/lessons', lessonRouter);
+    // Login routes
+    app.use('/api/login', loginRouter);
+    // Citizen reoutes
+    app.use('/api/citizens', citizenRouter);
   }
 }

@@ -1,10 +1,10 @@
-import { Citizen } from '../models/Citizen';
+import { Citizen } from '../models/Citizen.model';
 
 class CitizenRepo {
     constructor() {}
 
     getAllCitizens(options: any) {
-        return '';//Citizen.findAll(options);
+        return ''; //Citizen.findAll(options);
     }
 
     getCitizenById(id: string) {

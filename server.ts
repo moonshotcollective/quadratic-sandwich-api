@@ -4,7 +4,13 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import Server from './src/api/v1/index';
-import ContractEventService from './src/api/v1/services/ContractEventService';
+import ContractEventService from './src/api/v1/services/ContractEvents.service';
+import { generateJWT } from './src/api/v1/utils/jwt.utils';
+
+// Only generate a token for lower level environments
+if (process.env.NODE_ENV !== 'production') {
+    console.log('JWT', generateJWT());
+}
 
 // Start the Contract Services
 const contractEventService = new ContractEventService();
