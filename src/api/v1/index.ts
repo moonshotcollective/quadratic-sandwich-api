@@ -1,5 +1,6 @@
 import { Application, urlencoded, json } from 'express';
 import Routes from './routes';
+import cors from 'cors';
 
 export default class Server {
     constructor(app: Application) {
@@ -8,9 +9,10 @@ export default class Server {
     }
 
     public config(app: Application): void {
-        app.use(urlencoded({ extended: true }))
         app.use(json());
+        app.use(urlencoded({ extended: true }))
         //  app.use(rateLimiter());
+        app.use(cors())
     }
 }
 process.on('error', (err: any) => {

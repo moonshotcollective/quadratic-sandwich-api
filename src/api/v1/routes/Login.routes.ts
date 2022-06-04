@@ -11,7 +11,7 @@ class LoginRoutes {
     }
 
     initializeRoutes() {
-        this.router.route('/login').get(Auth.authorize(), this.loginCtrl.login);
+        this.router.route('/').post((req ,res ) => {console.log(req); Auth.authorize()});
     }
 }
 export default new LoginRoutes().router;

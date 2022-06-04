@@ -29,5 +29,5 @@ export const validateJWT = (token: string): Promise<ITokenPayload> => {
 
     return new Promise((resolve, reject) => {
         verify(token, privateKey, verifyOptions);
-    });
+      });
 };

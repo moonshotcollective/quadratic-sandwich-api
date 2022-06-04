@@ -6,8 +6,8 @@ export default class Routes {
 
   constructor(app: Application) {
     // Login routes
-    app.use('/api/login', loginRouter);
+    app.use(`/api/${process.env.API_VERSION}/login`, loginRouter);
     // Citizen reoutes
-    app.use('/api/citizens', citizenRouter);
+    app.use(`/api/${process.env.API_VERSION}/citizens`, citizenRouter);
   }
 }
