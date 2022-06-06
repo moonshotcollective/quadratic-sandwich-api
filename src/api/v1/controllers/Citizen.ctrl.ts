@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import CitizenRepo from '../repositories/Citizens.repo';
-import { apiErrorHandler } from '../handlers/errorHandler';
+import { apiErrorHandler } from '../handlers/error.handler';
 
 export default class CitizenCtrl {
     constructor() {}
