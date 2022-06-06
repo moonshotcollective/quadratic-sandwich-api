@@ -1,33 +1,57 @@
 import { Request, Response, NextFunction } from 'express';
-import { validateJWT } from '../utils/jwt.utils';
+import { generateJWT, validateJWT } from '../utils/jwt.utils';
+import { verifyEthLoginRequest } from '../utils/verifyEthLogin.utils';
 
-export const authorize =
-    () => async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            // let jwt = req.headers.authorization;
-            console.log("Login")
-            console.log(req.body)
+export const authorize = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    try {
+        console.log('moose');
 
-            // verify request has token
-            // if (!jwt) {
-            //     return res.status(401).json({ message: 'Invalid token ' });
-            // }
-            // // remove Bearer if using Bearer Authorization mechanism
-            // if (jwt.toLowerCase().startsWith('bearer')) {
-            //     jwt = jwt.slice('bearer'.length).trim();
-            // }
-            // console.log(jwt)
-            // // verify token hasn't expired yet
-            // const decodedToken = await validateJWT(jwt);
-            // console.log(decodedToken)
+        // let jwt = req.headers.authorization;
+        // console.log("Login")
+        // console.log(req.headers.authorization)
 
-            next();
+        // verify request has token
+        // if (!jwt) {
+        //     return res.status(401).json({ message: 'Invalid token ' });
+        // }
+        // // // remove Bearer if using Bearer Authorization mechanism
+        // if (jwt.toLowerCase().startsWith('bearer')) {
+        //     jwt = jwt.slice('bearer'.length).trim();
+        // }
+        // // console.log(jwt)
+        // // // verify token hasn't expired yet
+        // const decodedToken = await validateJWT(jwt);
+        // console.log(decodedToken)
 
-        } catch (error: any) {
-            if (error.name === 'TokenExpiredError') {
-                res.status(401).json({ message: 'Expired token' });
-                return;
-            }
-            res.status(500).json({ message: 'Failed to authenticate user' });
+        next();
+        return res.status(200);
+    } catch (error: any) {
+        if (error.name === 'TokenExpiredError') {
+            res.status(401).json({ message: 'Expired token' });
+            return;
         }
-    };
+        res.status(500).json({ message: 'Failed to authenticate user' });
+    }
+};
+
+export const authenticate = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    try {
+        const loginRequest: IEthLoginRequest = req.body;
+        if (verifyEthLoginRequest(loginRequest)) {
+            console.log(loginRequest)
+            // Generate the token and send it back to the client
+            const token = await generateJWT(loginRequest);
+            return res.status(200).json(token);
+        } else {
+            return res.status(401);
+        }
+    } catch (error) {}
+};
