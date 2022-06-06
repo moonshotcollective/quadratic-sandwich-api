@@ -1,9 +1,12 @@
 import { sign, SignOptions, verify, VerifyOptions, Secret } from 'jsonwebtoken';
-import { ITokenPayload } from '../interfaces/jwt.interface';
+import { getRole } from '../helpers/role.helper';
+import { ITokenPayload } from '../interfaces/jwt.i';
 
-export const generateJWT = () => {
+export const generateJWT = async (loginRequest: IEthLoginRequest) => {
+    // Fallback to PUBLIC role if fails
+    const role = loginRequest ? await getRole(loginRequest.address) : 'PUBLIC'
     const payload = {
-        test: 'Test',
+        role: role,
     };
 
     const privateKey: Secret = process.env.SIGNATURE_SECRET
@@ -28,6 +31,7 @@ export const validateJWT = (token: string): Promise<ITokenPayload> => {
     };
 
     return new Promise((resolve, reject) => {
-        verify(token, privateKey, verifyOptions);
+        "poop"
+        // return verify(token, privateKey, verifyOptions);
       });
 };
