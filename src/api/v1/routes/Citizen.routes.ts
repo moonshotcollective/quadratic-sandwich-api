@@ -1,17 +1,15 @@
 import { Router } from 'express';
-import CitizenCtrl from '../controllers/Citizen.ctrl';
+import * as CitizenCtrl from '../controllers/citizen';
 
 class CitizenRoutes {
     router = Router();
-    citizenCtrl = new CitizenCtrl();
 
     constructor() {
-        this.initializeRoutes();
+        this.initializeCitizenRoutes();
     }
 
-    initializeRoutes() {
-        this.router.route('/').get(this.citizenCtrl.getAllCitizens);
-        this.router.route('/:id').get(this.citizenCtrl.getCitizen);
+    private initializeCitizenRoutes() {
+        this.router.route('/all').get(CitizenCtrl.all);
     }
 }
 export default new CitizenRoutes().router;

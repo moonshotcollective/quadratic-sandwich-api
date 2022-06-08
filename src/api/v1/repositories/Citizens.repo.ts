@@ -1,4 +1,4 @@
-import { Citizen } from '../models/Citizen.model';
+import { Citizen } from '../models/citizen.model';
 
 class CitizenRepo {
     constructor() {}
