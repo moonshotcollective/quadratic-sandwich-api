@@ -6,7 +6,7 @@ if (env.error) {
 import express from 'express';
 import { Application } from 'express';
 import Server from './src/api/v1/index';
-import ContractEventService from './src/api/v1/services/ContractEvents.service';
+import ContractEventService from './src/api/v1/services/contractEvents.service';
 import MongoConnection from './src/api/v1/config/db.config';
 
 // Establish the Contract Services
