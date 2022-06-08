@@ -1,46 +1,40 @@
-import express from 'express';
-import { Application } from 'express';
 import * as dotenv from 'dotenv';
-
-const result = dotenv.config();
-if (result.error) {
+const env = dotenv.config();
+if (env.error) {
     dotenv.config({ path: '.env' });
 }
-
+import express from 'express';
+import { Application } from 'express';
 import Server from './src/api/v1/index';
 import ContractEventService from './src/api/v1/services/ContractEvents.service';
-import { generateJWT } from './src/api/v1/utils/jwt.utils';
 import MongoConnection from './src/api/v1/config/db.config';
 
-// Only generate a token for lower level environments
-if (process.env.NODE_ENV !== 'production') {
-    // console.log('JWT', generateJWT());
-}
-
-// Start the Contract Services
+// Establish the Contract Services
 const contractEventService = new ContractEventService();
 
+// Establish the DB connection
 const dbConnection = new MongoConnection(
-    process.env.MONGO_URI ? process.env.MONGO_URI : '',
+    process.env.MONGO_URI ? process.env.MONGO_URI : '', // FIXME: Add fallback URI
 );
 
-// Express API
+// Establish Express API
 const app: Application = express();
 const server: Server = new Server(app);
 const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const host: string = 'localhost';
 
-dbConnection.connect(() => {
-    app.listen(port, host, () => {
+// Start the Application
+dbConnection.connect((): void => {
+    app.listen(port, host, (): void => {
         console.log({
             level: 'info',
             message: `🌏 Express server started on http://${host}:${port}`,
         });
-    }).on('error', (err: any) => {
+    }).on('error', (err: any): void => {
         if (err.code === 'EADDRINUSE') {
             console.log({
                 level: 'error',
-                message: 'server startup error: address already in use',
+                message: 'Server startup error: address already in use',
                 error: err,
             });
         } else {
@@ -50,7 +44,7 @@ dbConnection.connect(() => {
 });
 
 // Close the Mongoose connection, when receiving SIGINT
-process.on('SIGINT', () => {
+process.on('SIGINT', (): void => {
     console.info('\nGracefully shutting down');
     dbConnection.close(err => {
         if (err) {
