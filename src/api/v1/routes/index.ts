@@ -1,6 +1,6 @@
 import { Application } from 'express';
-import citizenRouter from './Citizen.routes';
-import loginRouter from './Login.routes';
+import citizenRouter from './citizen.routes';
+import loginRouter from './login.routes';
 
 export default class Routes {
 

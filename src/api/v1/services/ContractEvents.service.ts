@@ -1,26 +1,36 @@
 import { providers, Contract } from 'ethers';
 
 export default class ContractEventService {
-    provider = new providers.JsonRpcProvider(process.env.RPC_ENDPOINT);
-    badgeAddress = process.env.CONTRACT_ADDRESS
+    private provider = new providers.JsonRpcProvider(process.env.RPC_ENDPOINT);
+    private badgeAddress = process.env.CONTRACT_ADDRESS
         ? process.env.CONTRACT_ADDRESS
         : '0'; // Fallback ?
-    badgeAbi = [
+    private badgeAbi = [
         'event SetCitizens(address indexed sender, address[] citizens)',
     ];
-    badgeContract = new Contract(
+    private badgeContract = new Contract(
         this.badgeAddress,
         this.badgeAbi,
         this.provider,
     );
 
     constructor() {
-        this.initializeCitizenService();
+        console.log({
+            level: 'info',
+            message: `Starting Contract Event Service on ${this.badgeAddress}`,
+        });
+        this.initializeContractEventService();
     }
 
-    initializeCitizenService() {
-        this.badgeContract.on('SetCitizens', (): void => {
-            console.log('Citizens Set');
-        });
+    initializeContractEventService() {
+        this.badgeContract.on(
+            'SetCitizens',
+            (sender: string, citizens: string[]): void => {
+                console.log({
+                    level: 'info',
+                    message: `Citizens set: ${sender}, ${citizens}`,
+                });
+            },
+        );
     }
 }
