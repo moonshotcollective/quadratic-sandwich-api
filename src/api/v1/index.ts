@@ -1,6 +1,7 @@
 import { Application, urlencoded, json } from 'express';
 import Routes from './routes';
 import cors from 'cors';
+import helmet from 'helmet';
 
 export default class Server {
     constructor(app: Application) {
@@ -10,9 +11,11 @@ export default class Server {
 
     public config(app: Application): void {
         app.use(json());
-        app.use(urlencoded({ extended: true }))
+        app.use(urlencoded({ extended: true }));
         //  app.use(rateLimiter());
-        app.use(cors())
+        app.use(cors());
+        app.use(helmet()); // Use Helmet for security
+        app.disable('x-powered-by'); // Reduce fingerprinting
     }
 }
 process.on('error', (err: any) => {
