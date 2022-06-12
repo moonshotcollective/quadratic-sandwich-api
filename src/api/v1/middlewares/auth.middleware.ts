@@ -46,12 +46,20 @@ export const authenticate = async (
     try {
         const loginRequest: IEthLoginRequest = req.body;
         if (verifyEthLoginRequest(loginRequest)) {
-            console.log(loginRequest)
+            console.log({
+                level: 'info',
+                message: `Login Request: ${loginRequest.address}`,
+            });
             // Generate the token and send it back to the client
             const token = await generateJWT(loginRequest);
-            return res.status(200).json(token);
+            res.status(200).json(token);
         } else {
-            return res.status(401);
+            res.status(401).json({"Error": "Invalid token request."});
         }
-    } catch (error) {}
+        return;
+    } catch (error) {
+        console.log(error)
+        res.status(401).json({"Error": "Invalid token validation."})
+        return; 
+    }
 };
