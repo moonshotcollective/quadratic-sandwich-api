@@ -18,8 +18,9 @@
     "mongoose-unique-validator": "^3.1.0"
   },
   "scripts": {
-    "build": "tsc",
-    "server:dev": "ts-node-dev --transpile-only --ignore-watch node_modules ./server.ts"
+    "build": "tsc --build",
+    "server:dev": "ts-node-dev --transpile-only --ignore-watch node_modules ./server.ts",
+    "server:run": "ts-node-dev --transpile-only --ignore-watch node_modules ./disc/server.js"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
