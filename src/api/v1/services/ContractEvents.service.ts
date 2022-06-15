@@ -1,21 +1,37 @@
-import { providers, Contract } from 'ethers';
+import { providers, Contract, utils, BigNumber } from 'ethers';
+import { ICitizen } from '../interfaces/citizen.i';
 import { Citizen } from '../models/citizen.model';
 
 export default class ContractEventService {
     private provider = new providers.JsonRpcProvider(process.env.RPC_ENDPOINT);
-    private mainnetProvider = new providers.JsonRpcProvider(process.env.MAINNET_RPC_ENDPOINT);
+    private mainnetProvider = new providers.JsonRpcProvider(
+        process.env.MAINNET_RPC_ENDPOINT,
+    );
     private badgeAddress = process.env.CONTRACT_ADDRESS
         ? process.env.CONTRACT_ADDRESS
         : '0'; // Fallback ?
+    private opcoTuple =
+        '(address co, address[] citizens, uint256 supply, uint256 minted)';
+    private citizenTuple =
+        '(address citizen, address opco, bool minted, address delegate, uint256 delegations)';
     private badgeAbi = [
-        'event SetCitizens(address indexed sender, address[] citizens)',
-        'function getOpCoCitizens(address _opco) public view returns (address[] memory)'
+        'event OPsAdded(address indexed _sender)',
+        'event OPCOsAdded(address indexed _op, uint256 indexed _lastCursor)',
+        'event CitizensAdded(address indexed _opco, uint256 indexed _lastCursor)',
+        'event CitizenRemoved(address indexed _opco, address indexed _removed)',
+        'event Minted(address indexed _minter, address indexed _opco)',
+        'event Burned(address _burner)',
+
+        `function getCitizens(uint256 cursor, uint256 count) view public returns (${this.citizenTuple}[] memory, uint256 newCursor)`,
+        `function getOPCOs(uint256 cursor, uint256 count) view public returns(${this.opcoTuple}[] memory, uint256 newCursor)`,
     ];
     private badgeContract = new Contract(
         this.badgeAddress,
         this.badgeAbi,
         this.provider,
     );
+
+    private badeContract2 = this.provider.getCode(this.badgeAddress);
 
     constructor() {
         console.log({
@@ -24,54 +40,83 @@ export default class ContractEventService {
         });
         this.initializeContractEventService();
     }
-    
-    initializeContractEventService() {
-        this.setCitizenEventHandler();
+
+    async initializeContractEventService() {
+        this.addCitizensEventHandler();
+        this.addOPCOsEventHandler();
+        console.log(await this.badeContract2);
     }
 
-    private setCitizenEventHandler() { 
+    private addOPCOsEventHandler() {
         this.badgeContract.on(
-            'SetCitizens',
-            async (sender: string, citizens: string[]): Promise<void> => {
+            'OPCOsAdded',
+            async (_op: string, _lastCursor: number): Promise<void> => {
                 try {
                     console.log({
                         level: 'info',
-                        message: `Citizens set: ${sender}, ${citizens}`,
+                        message: `OPCo's Added: ${_op}, Last Index: ${_lastCursor}`,
                     });
 
-                    const opCoCitizens = await this.badgeContract.getOpCoCitizens(sender);
-                    console.log(opCoCitizens)
+                    const opcos = await this.badgeContract.getOPCOs(
+                        BigNumber.from(
+                            _lastCursor - 1 >= 0 ? _lastCursor - 1 : 0,
+                        ),
+                        BigNumber.from(_lastCursor),
+                    );
+                    // const {0: opCoAddresses}
+                    console.log(opcos);
+                } catch (error) {
+                    console.log(error);
+                }
+            },
+        );
+    }
+    /** Enable the SetCitizen Event Handler.
+     *  This listens for the SetCitizens Contract emission which then retrivies
+     *  the OpCo citizen list and applies it to the database.
+     */
+    private addCitizensEventHandler() {
+        this.badgeContract.on(
+            'CitizensAdded',
+            async (_opco: string, _lastCursor: number): Promise<void> => {
+                try {
+                    console.log({
+                        level: 'info',
+                        message: `Citizens set: ${_opco}`,
+                    });
 
+                    const [citizens, cursor] =
+                        await this.badgeContract.getCitizens(
+                            BigNumber.from(0),
+                            BigNumber.from(_lastCursor),
+                        );
 
-                    // TODO: Check for duplicated entries and ignore those
-
-                    for (let i = 0; i < opCoCitizens.length; i++) {
-                        const address = opCoCitizens[i];
-                        console.log(address);
-                        const ens = await this.mainnetProvider.lookupAddress(address);
-                        const citizen = new Citizen({
-                            address: address,
-                            ens: ens,
-                            opco: sender,
+                    const parsedCitizens = citizens.map((d: any): ICitizen => {
+                        return new Citizen({
+                            address: d.citizen,
+                            ens: '',
+                            opco: d.opco,
                             minted: false,
                             delegatedTo: null,
-                            votes: {},
-                            meta: {},
+                            votes: {"test": 1},
+                            meta: {"test": 2},
                         });
-                        console.log(citizen);
-                        await citizen.save();
-                    }
+                    });
+
+                    Citizen.insertMany(parsedCitizens).catch(error => {
+                        // TODO: Check if error is MongoBulkWriteError: E11000 duplicate key error
+                        // And update all other mutable fields
+                        Citizen.updateMany({address: error.errors.address.value}, {ens: "HA"}, () => {})
+                    });
 
                 } catch (error) {
                     console.log({
                         level: 'error',
-                        message: `Citizens set: ${sender}, ${citizens}`,
+                        message: `Citizens set: ${_opco}`,
                         error: error,
                     });
                 }
             },
         );
     }
-
-
 }
