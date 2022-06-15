@@ -116,6 +116,6 @@
     "forceConsistentCasingInFileNames": true
   }, 
   "include": [
-    "src/**/*.ts"
+    "src/api/**/**/*.ts"
   ]
 }

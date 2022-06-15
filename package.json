@@ -15,12 +15,13 @@
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.7.0",
     "mongoose": "^6.3.6",
-    "mongoose-unique-validator": "^3.1.0"
+    "mongoose-unique-validator": "^3.1.0",
+    "tsc-alias": "^1.6.9"
   },
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc && npx tsc-alias",
     "server:dev": "ts-node-dev --transpile-only --ignore-watch node_modules ./server.ts",
-    "server:run": "ts-node-dev --transpile-only --ignore-watch node_modules ./dist/server.js"
+    "server:run": "npm run build && cross-env NODE_ENV=production node dist/index.js"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
