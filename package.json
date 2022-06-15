@@ -20,14 +20,9 @@
     "tsc-alias": "^1.6.9"
   },
   "scripts": {
-
-    "eslint": "eslint src/server.ts",
     "build": "tsc",
-    "lint": "./node_modules/eslint/bin/eslint.js  src --ext .ts",
     "dev": "nodemon server.ts",
-    "start": "node dist/src/api/v1/index.js",
-    "test": "jest",
-    "fix-lint": "./node_modules/eslint/bin/eslint.js  src --ext .ts --fix"
+    "start": "nodemon ./dist/server.js"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
