@@ -101,5 +101,6 @@
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
     "outDir": "./disc", // js files - production mode
     "rootDir": "./"  // ts files - develop mode
-  }
+  }, 
+  "include": ["src/**/*.ts"]
 }
