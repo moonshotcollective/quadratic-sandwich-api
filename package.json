@@ -1,7 +1,7 @@
 {
   "name": "quadratic-sandwich-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "repository": "https://github.com/moonshotcollective/quadratic-sandwich-api.git",
   "author": "Moonshot Collective @ Gitcoin <hans@gitcoin.co>",
   "license": "MIT",
@@ -20,9 +20,14 @@
     "tsc-alias": "^1.6.9"
   },
   "scripts": {
-    "build": "tsc --build",
-    "server:dev": "ts-node-dev --transpile-only --ignore-watch node_modules ./server.ts",
-    "server:run": "ts-node-dev --transpile-only --ignore-watch node_modules ./dist/src/api/v1/index.js"
+
+    "eslint": "eslint src/server.ts",
+    "build": "tsc",
+    "lint": "./node_modules/eslint/bin/eslint.js  src --ext .ts",
+    "dev": "nodemon server.ts",
+    "start": "node dist/src/api/v1/index.js",
+    "test": "jest",
+    "fix-lint": "./node_modules/eslint/bin/eslint.js  src --ext .ts --fix"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",

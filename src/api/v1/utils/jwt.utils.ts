@@ -1,6 +1,7 @@
 import { sign, SignOptions, verify, VerifyOptions, Secret } from 'jsonwebtoken';
 import { getRole } from '../helpers/role.helper';
 import { ITokenPayload } from '../interfaces/jwt.i';
+import { IEthLoginRequest } from '../interfaces/ethLoginRequest.i';
 
 export const generateJWT = async (loginRequest: IEthLoginRequest) => {
     // Fallback to PUBLIC role if fails

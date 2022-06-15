@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { IOnConnectedCallback } from '../interfaces/onConnectedCallback.i';
 
 // To use global promise for mongoose
 (<any>mongoose).Promise = global.Promise;

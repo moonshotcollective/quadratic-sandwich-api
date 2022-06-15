@@ -1,4 +1,4 @@
 /** Callback for establishing or re-stablishing mongo connection */
-interface IOnConnectedCallback {
+export interface IOnConnectedCallback {
     (): void;
 }

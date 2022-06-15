@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { generateJWT, validateJWT } from '../utils/jwt.utils';
 import { verifyEthLoginRequest } from '../utils/verifyEthLogin.utils';
+import { IEthLoginRequest } from '../interfaces/ethLoginRequest.i';
 
 export const authorize = async (
     req: Request,
