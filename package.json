@@ -16,12 +16,13 @@
     "mongodb": "^4.7.0",
     "mongoose": "^6.3.6",
     "mongoose-unique-validator": "^3.1.0",
+    "ts-node": "^10.8.1",
     "tsc-alias": "^1.6.9"
   },
   "scripts": {
-    "build": "tsc && npx tsc-alias",
+    "build": "tsc --build",
     "server:dev": "ts-node-dev --transpile-only --ignore-watch node_modules ./server.ts",
-    "server:run": "npm run build && cross-env NODE_ENV=production node dist/index.js"
+    "server:run": "ts-node-dev --transpile-only --ignore-watch node_modules ./dist/src/api/v1/index.js"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
@@ -41,6 +42,7 @@
     "eslint-import-resolver-typescript": "^2.7.1",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^4.0.0",
+    "nodemon": "^2.0.16",
     "prettier": "^2.6.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^4.7.2"
