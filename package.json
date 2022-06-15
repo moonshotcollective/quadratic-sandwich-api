@@ -22,7 +22,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon server.ts",
-    "start": "nodemon ./dist/server.js"
+    "start": "node ./dist/server.js"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
