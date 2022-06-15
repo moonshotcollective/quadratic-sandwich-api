@@ -1,6 +1,6 @@
 import { Model, Schema, model } from 'mongoose';
-import mongooseUniqueValidator from 'mongoose-unique-validator';
 import { ICitizen } from '../interfaces/citizen.i';
+import { uniqueValidator } from '../validators/unique.validator'; 
 
 interface ICitizenModel extends Model<ICitizen> {}
 
@@ -14,7 +14,7 @@ const citizenSchema = new Schema({
     meta: { type: Object }, // TODO: Define citizen metadata interface
 });
 
-citizenSchema.plugin(mongooseUniqueValidator); 
+citizenSchema.plugin(uniqueValidator); 
 
 export const Citizen: ICitizenModel = model<ICitizen, ICitizenModel>(
     'citizens',
