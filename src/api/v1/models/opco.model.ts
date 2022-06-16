@@ -1,10 +1,11 @@
 import { Model, Schema, model } from 'mongoose';
-import { IOpCo } from '../interfaces/opco.i';
+import { IOPCO } from '../interfaces/opco.i';
+import { uniqueValidator } from '../validators/unique.validator';
 
-interface IOpCoModel extends Model<IOpCo> {}
+interface IOPCOModel extends Model<IOPCO> {}
 
-const opCoSchema = new Schema({
-    address: { type: String, required: true },
+const opcoSchema = new Schema({
+    address: { type: String, required: true, unique: true },
     ens: { type: String },
     citizens: {type: Object },
     supply: { type: Number },
@@ -14,8 +15,10 @@ const opCoSchema = new Schema({
     meta: { type: Object }, // TODO: Meta schema
 });
 
-export const OpCo: IOpCoModel = model<IOpCo, IOpCoModel>(
+opcoSchema.plugin(uniqueValidator); 
+
+export const OPCO: IOPCOModel = model<IOPCO, IOPCOModel>(
     'opcos',
-    opCoSchema,
+    opcoSchema,
 );
 

@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 
-export interface IOpCo extends Document {
+export interface IOPCO extends Document {
     address: string; 
     ens: string;
     citizens: object; 

@@ -1,6 +1,8 @@
 import { providers, Contract, utils, BigNumber } from 'ethers';
 import { ICitizen } from '../interfaces/citizen.i';
+import { IOPCO } from '../interfaces/opco.i';
 import { Citizen } from '../models/citizen.model';
+import { OPCO } from '../models/opco.model';
 
 export default class ContractEventService {
     private provider = new providers.JsonRpcProvider(process.env.RPC_ENDPOINT);
@@ -31,8 +33,6 @@ export default class ContractEventService {
         this.provider,
     );
 
-    private badeContract2 = this.provider.getCode(this.badgeAddress);
-
     constructor() {
         console.log({
             level: 'info',
@@ -44,7 +44,6 @@ export default class ContractEventService {
     async initializeContractEventService() {
         this.addCitizensEventHandler();
         this.addOPCOsEventHandler();
-        console.log(await this.badeContract2);
     }
 
     private addOPCOsEventHandler() {
@@ -57,14 +56,37 @@ export default class ContractEventService {
                         message: `OPCo's Added: ${_op}, Last Index: ${_lastCursor}`,
                     });
 
-                    const opcos = await this.badgeContract.getOPCOs(
-                        BigNumber.from(
-                            _lastCursor - 1 >= 0 ? _lastCursor - 1 : 0,
-                        ),
+                    const [opcos, cursor] = await this.badgeContract.getOPCOs(
+                        BigNumber.from(0),
                         BigNumber.from(_lastCursor),
                     );
-                    // const {0: opCoAddresses}
-                    console.log(opcos);
+
+                    const parsedOPCOs = opcos.map((d: any): IOPCO => {
+                        return new OPCO({
+                            address: d.co,
+                            ens: '',
+                            citizens: d.citizens,
+                            supply: d.supply.toNumber(),
+                            minted: d.minted.toNumber(),
+                            onboard: 0,
+                            meta: {
+                                name: 'test1',
+                                description: 'testdescription',
+                                profileImg: 'img',
+                                headerImg: 'img',
+                            },
+                        });
+                    });
+
+                    OPCO.insertMany(parsedOPCOs).catch((error: any) => {
+                        // TODO: Check if error is MongoBulkWriteError: E11000 duplicate key error
+                        // And update all other mutable fields
+                        OPCO.updateMany(
+                            { address: error.errors.address.value },
+                            { ens: 'nulleth.eth' },
+                            () => {},
+                        );
+                    });
                 } catch (error) {
                     console.log(error);
                 }
@@ -98,17 +120,20 @@ export default class ContractEventService {
                             opco: d.opco,
                             minted: false,
                             delegatedTo: null,
-                            votes: {"test": 1},
-                            meta: {"test": 2},
+                            votes: { test: 1 },
+                            meta: { test: 2 },
                         });
                     });
 
-                    Citizen.insertMany(parsedCitizens).catch(error => {
+                    Citizen.insertMany(parsedCitizens).catch((error: any) => {
                         // TODO: Check if error is MongoBulkWriteError: E11000 duplicate key error
                         // And update all other mutable fields
-                        Citizen.updateMany({address: error.errors.address.value}, {ens: "HA"}, () => {})
+                        Citizen.updateMany(
+                            { address: error.errors.address.value },
+                            { ens: 'HA' },
+                            () => {},
+                        );
                     });
-
                 } catch (error) {
                     console.log({
                         level: 'error',
