@@ -1,12 +1,15 @@
 import { sign, SignOptions, verify, VerifyOptions, Secret } from 'jsonwebtoken';
 import { getRole } from '../helpers/role.helper';
-import { ITokenPayload } from '../interfaces/jwt.i';
 import { IEthLoginRequest } from '../interfaces/ethLoginRequest.i';
+import { ITokenPayload } from '../interfaces/tokenPayload.i';
 
 export const generateJWT = async (loginRequest: IEthLoginRequest) => {
     // Fallback to PUBLIC role if fails
     const role = loginRequest ? await getRole(loginRequest.address) : 'PUBLIC'
-    const payload = {
+
+    const payload: ITokenPayload = {
+        address: loginRequest.address,
+        signature: loginRequest.signature,
         role: role,
     };
 
