@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import * as OpCoCtrl from '../controllers/opco';
+import * as OPCOCtrl from '../controllers/opco';
 
-class OpCoRoutes { 
+class OPCORoutes { 
     router = Router(); 
 
     constructor() {
@@ -9,8 +9,9 @@ class OpCoRoutes {
     }
 
     private initializeOpCoRoutes() {
-        this.router.route('/all').get(OpCoCtrl.all);
+        this.router.route('/all').get(OPCOCtrl.all);
+        this.router.route('/:address?').get(OPCOCtrl.query);
     }
 }
 
-export default new OpCoRoutes().router;
+export default new OPCORoutes().router;
