@@ -1,16 +1,16 @@
 import { RequestHandler } from 'express';
 import { customRequestHandler } from '../../middlewares/request.middleware';
-import { OPCO } from '../../models/opco.model';
+import { Citizen } from '../../models/citizen.model';
 import { validateJWT } from '../../utils/jwt.utils';
 
-const updateOPCOWrapper: RequestHandler = async (req, res): Promise<void> => {
+const updateCitizenWrapper: RequestHandler = async (req, res): Promise<void> => {
     try {
         let role = 'PUBLIC';
         if (req.headers.authorization) {
             const decodedToken = await validateJWT(req.headers.authorization);
             role = decodedToken.role;
             // only OP has this access
-            if (role !== 'OP') {
+            if (role !== 'CITIZEN') {
                 const error = {
                     name: 'InvalidRole',
                     message: 'Invalid Role Access.',
@@ -34,7 +34,7 @@ const updateOPCOWrapper: RequestHandler = async (req, res): Promise<void> => {
         const query = { address: req.query.address };
         const update = req.body;
 
-        const opco = await OPCO.findOneAndUpdate(query, update, {
+        const opco = await Citizen.findOneAndUpdate(query, update, {
             new: true,
         }).exec();
 
@@ -49,4 +49,4 @@ const updateOPCOWrapper: RequestHandler = async (req, res): Promise<void> => {
     }
 };
 
-export const update = customRequestHandler(updateOPCOWrapper);
+export const update = customRequestHandler(updateCitizenWrapper);

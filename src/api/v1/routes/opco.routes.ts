@@ -11,7 +11,6 @@ class OPCORoutes {
     private initializeOpCoRoutes() {
         this.router.route('/all').get(OPCOCtrl.all);
         this.router.route('/:address?').get(OPCOCtrl.query);
-        // This needs to be restricted to the OP role 
         this.router.route('/update/:address?').post(OPCOCtrl.update);
     }
 }
