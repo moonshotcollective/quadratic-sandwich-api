@@ -10,7 +10,7 @@ const updateOPCOWrapper: RequestHandler = async (req, res): Promise<void> => {
             const decodedToken = await validateJWT(req.headers.authorization);
             role = decodedToken.role;
             // only OP has this access
-            if (role !== 'OP') {
+            if (role !== 'OPCO') {
                 const error = {
                     name: 'InvalidRole',
                     message: 'Invalid Role Access.',

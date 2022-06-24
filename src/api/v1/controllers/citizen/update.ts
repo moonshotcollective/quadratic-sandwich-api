@@ -10,7 +10,7 @@ const updateCitizenWrapper: RequestHandler = async (req, res): Promise<void> => 
             const decodedToken = await validateJWT(req.headers.authorization);
             role = decodedToken.role;
             // only OP has this access
-            if (role !== 'CITIZEN') {
+            if (role !== 'CITIZEN') { // OPCO TOO? 
                 const error = {
                     name: 'InvalidRole',
                     message: 'Invalid Role Access.',
@@ -32,6 +32,7 @@ const updateCitizenWrapper: RequestHandler = async (req, res): Promise<void> => 
         }
 
         const query = { address: req.query.address };
+        // todo: restrict fields
         const update = req.body;
 
         const opco = await Citizen.findOneAndUpdate(query, update, {
