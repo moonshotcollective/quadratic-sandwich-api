@@ -1,4 +1,5 @@
 import { providers, Contract, utils, BigNumber } from 'ethers';
+import mongoose from 'mongoose';
 import { ICitizen } from '../interfaces/citizen.i';
 import { IOPCO } from '../interfaces/opco.i';
 import { Citizen } from '../models/citizen.model';
@@ -18,14 +19,16 @@ export default class ContractEventService {
         '(address citizen, address opco, bool minted, address delegate, uint256 delegations)';
     private badgeAbi = [
         'event OPsAdded(address indexed _sender)',
-        'event OPCOsAdded(address indexed _op, uint256 indexed _lastCursor)',
-        'event CitizensAdded(address indexed _opco, uint256 indexed _lastCursor)',
+        'event OPCOsAdded(address indexed _op, uint256 indexed _lastCursor, address[] _opcos)', // s?
+        'event CitizensAdded(address indexed _opco, uint256 indexed _lastCursor, address[] _citizens)', // s?
         'event CitizenRemoved(address indexed _opco, address indexed _removed)',
         'event Minted(address indexed _minter, address indexed _opco)',
         'event Burned(address _burner)',
 
         `function getCitizens(uint256 cursor, uint256 count) view public returns (${this.citizenTuple}[] memory, uint256 newCursor)`,
+        `function getCitizen(address _adr) public view returns (${this.citizenTuple} memory)`,
         `function getOPCOs(uint256 cursor, uint256 count) view public returns(${this.opcoTuple}[] memory, uint256 newCursor)`,
+        `function getOPCO(address _adr) view public returns(${this.opcoTuple} memory)`,
     ];
     private badgeContract = new Contract(
         this.badgeAddress,
@@ -49,44 +52,68 @@ export default class ContractEventService {
     private addOPCOsEventHandler() {
         this.badgeContract.on(
             'OPCOsAdded',
-            async (_op: string, _lastCursor: number): Promise<void> => {
+            async (
+                _op: string,
+                _lastCursor: number,
+                _opcos: string[],
+            ): Promise<void> => {
                 try {
+
                     console.log({
                         level: 'info',
-                        message: `OPCo's Added: ${_op}, Last Index: ${_lastCursor}`,
+                        message: `OPCo's Added: ${_op}, Last Index: ${_lastCursor}, Addresses: ${_opcos}`,
                     });
 
-                    const [opcos, cursor] = await this.badgeContract.getOPCOs(
-                        BigNumber.from(0),
-                        BigNumber.from(_lastCursor),
+                    
+                    const parsedContractOPCOs = await Promise.all(
+                        _opcos.map(async (adr: string) => {
+                            const opco = await this.badgeContract.getOPCO(adr);
+                            return new OPCO({
+                                address: opco.co,
+                                ens: '',
+                                citizens: opco.citizens,
+                                supply: opco.supply.toNumber(),
+                                minted: opco.minted.toNumber(),
+                                onboard: 0,
+                                meta: {
+                                    name: 'test1',
+                                    description: 'testdescription',
+                                    profileImg: 'img',
+                                    headerImg: 'img',
+                                },
+                            });
+                        }),
                     );
 
-                    const parsedOPCOs = opcos.map((d: any): IOPCO => {
-                        return new OPCO({
-                            address: d.co,
-                            ens: '',
-                            citizens: d.citizens,
-                            supply: d.supply.toNumber(),
-                            minted: d.minted.toNumber(),
-                            onboard: 0,
-                            meta: {
-                                name: 'test1',
-                                description: 'testdescription',
-                                profileImg: 'img',
-                                headerImg: 'img',
-                            },
-                        });
-                    });
+                    // Insert many breaks and difficult to resolve
+                    // OPCO.insertMany(parsedContractOPCOs).catch((error: any) => {
+                    //     console.log(error)
+                    //     console.log( error instanceof mongoose.Error.ValidationError);
+                    // });
 
-                    OPCO.insertMany(parsedOPCOs).catch((error: any) => {
-                        // TODO: Check if error is MongoBulkWriteError: E11000 duplicate key error
-                        // And update all other mutable fields
-                        OPCO.updateMany(
-                            { address: error.errors.address.value },
-                            { ens: 'nulleth.eth' },
-                            () => {},
-                        );
-                    });
+                    for (let i = 0; i < parsedContractOPCOs.length; i++) {
+                        try {
+                            await parsedContractOPCOs[i].save();
+                        } catch (error) {
+                            console.log({
+                                level: 'error',
+                                info: 'Error saving OPCO',
+                                error: error,
+                            });
+                            if (
+                                error instanceof mongoose.Error.ValidationError
+                            ) {
+                                await OPCO.findOneAndUpdate(
+                                    { address: parsedContractOPCOs[i].address },
+                                    {
+                                        citizens: parsedContractOPCOs[i].citizens,
+                                        supply: parsedContractOPCOs[i].supply,
+                                        minted: parsedContractOPCOs[i].minted,
+                                    },
+                                ).exec();
+                            }
+                        }
+                    }
                 } catch (error) {
                     console.log(error);
                 }
@@ -100,7 +127,11 @@ export default class ContractEventService {
     private addCitizensEventHandler() {
         this.badgeContract.on(
             'CitizensAdded',
-            async (_opco: string, _lastCursor: number): Promise<void> => {
+            async (
+                _opco: string, 
+                _lastCursor: number, 
+                _citizens: string[]
+            ): Promise<void> => {
                 try {
                     console.log({
                         level: 'info',
@@ -113,7 +144,8 @@ export default class ContractEventService {
                             BigNumber.from(_lastCursor),
                         );
 
-                    const parsedCitizens = citizens.map((d: any): ICitizen => {
+                    const parsedCitizens = await Promise.all(
+                        citizens.map((d: any): ICitizen => {
                         return new Citizen({
                             address: d.citizen,
                             ens: '',
@@ -123,7 +155,7 @@ export default class ContractEventService {
                             votes: { test: 1 },
                             meta: { test: 2 },
                         });
-                    });
+                    }));
 
                     Citizen.insertMany(parsedCitizens).catch((error: any) => {
                         // TODO: Check if error is MongoBulkWriteError: E11000 duplicate key error
