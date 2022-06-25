@@ -8,6 +8,7 @@ import { Application } from 'express';
 import Server from './src/api/v1/index';
 import ContractEventService from './src/api/v1/services/contractEvents.service';
 import MongoConnection from './src/api/v1/config/db.config';
+import { syncDB } from './src/api/v1/utils/syncDB.utils';
 
 // Establish the Contract Services
 const contractEventService = new ContractEventService();
@@ -22,6 +23,8 @@ const app: Application = express();
 const server: Server = new Server(app);
 const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
 const host: string = '0.0.0.0';
+
+syncDB();
 
 // Start the Application
 dbConnection.connect((): void => {

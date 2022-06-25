@@ -23,6 +23,7 @@ const badgeAbi = [
     `function getCitizen(address _adr) public view returns (${citizenTuple} memory)`,
     `function getOPCOs(uint256 cursor, uint256 count) view public returns(${opcoTuple}[] memory, uint256 newCursor)`,
     `function getOPCO(address _adr) view public returns(${opcoTuple} memory)`,
+    'function CitizenCount() view public returns (uint256)', 
 ];
 
 export const badgeContract = new Contract(

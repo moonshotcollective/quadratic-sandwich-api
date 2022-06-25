@@ -38,7 +38,7 @@ export const handleCitizensAdded = async (
                     info: 'Error saving Citizen',
                     error: error,
                 });
-                if (error instanceof mongoose.Error.ValidationError) {
+                if (error instanceof mongoose.Error.ValidationError) { // TODO: more specific error handling
                     console.log({
                         level: 'info',
                         info: 'Add Citizen: Citizen already exists, updating instead...',
