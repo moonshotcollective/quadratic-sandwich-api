@@ -1,12 +1,6 @@
-import { providers, Contract, utils, BigNumber } from 'ethers';
-import mongoose from 'mongoose';
 import { badgeContract } from '../config/contract.config';
 import { handleOPCOsAdded } from '../handlers/op/opcos.added.handler';
 import { handleCitizensAdded } from '../handlers/opco/citizens.added.handler';
-import { ICitizen } from '../interfaces/citizen.i';
-import { IOPCO } from '../interfaces/opco.i';
-import { Citizen } from '../models/citizen.model';
-import { OPCO } from '../models/opco.model';
 
 export default class ContractEventService {
     private badgeContract = badgeContract;
