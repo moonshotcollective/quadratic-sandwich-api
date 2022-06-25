@@ -58,13 +58,11 @@ export default class ContractEventService {
                 _opcos: string[],
             ): Promise<void> => {
                 try {
-
                     console.log({
                         level: 'info',
                         message: `OPCo's Added: ${_op}, Last Index: ${_lastCursor}, Addresses: ${_opcos}`,
                     });
 
-                    
                     const parsedContractOPCOs = await Promise.all(
                         _opcos.map(async (adr: string) => {
                             const opco = await this.badgeContract.getOPCO(adr);
@@ -85,12 +83,6 @@ export default class ContractEventService {
                         }),
                     );
 
-                    // Insert many breaks and difficult to resolve
-                    // OPCO.insertMany(parsedContractOPCOs).catch((error: any) => {
-                    //     console.log(error)
-                    //     console.log( error instanceof mongoose.Error.ValidationError);
-                    // });
-
                     for (let i = 0; i < parsedContractOPCOs.length; i++) {
                         try {
                             await parsedContractOPCOs[i].save();
@@ -103,10 +95,15 @@ export default class ContractEventService {
                             if (
                                 error instanceof mongoose.Error.ValidationError
                             ) {
+                                console.log({
+                                    level: 'info',
+                                    info: 'Add OPCO: OPCO already exists. Updating instead...',
+                                });
                                 await OPCO.findOneAndUpdate(
                                     { address: parsedContractOPCOs[i].address },
                                     {
-                                        citizens: parsedContractOPCOs[i].citizens,
+                                        citizens:
+                                            parsedContractOPCOs[i].citizens,
                                         supply: parsedContractOPCOs[i].supply,
                                         minted: parsedContractOPCOs[i].minted,
                                     },
@@ -128,48 +125,66 @@ export default class ContractEventService {
         this.badgeContract.on(
             'CitizensAdded',
             async (
-                _opco: string, 
-                _lastCursor: number, 
-                _citizens: string[]
+                _opco: string,
+                _lastCursor: number,
+                _citizens: string[],
             ): Promise<void> => {
                 try {
                     console.log({
                         level: 'info',
-                        message: `Citizens set: ${_opco}`,
+                        message: `Citizens set by: ${_opco}, `,
                     });
 
-                    const [citizens, cursor] =
-                        await this.badgeContract.getCitizens(
-                            BigNumber.from(0),
-                            BigNumber.from(_lastCursor),
-                        );
-
-                    const parsedCitizens = await Promise.all(
-                        citizens.map((d: any): ICitizen => {
-                        return new Citizen({
-                            address: d.citizen,
-                            ens: '',
-                            opco: d.opco,
-                            minted: false,
-                            delegatedTo: null,
-                            votes: { test: 1 },
-                            meta: { test: 2 },
-                        });
-                    }));
-
-                    Citizen.insertMany(parsedCitizens).catch((error: any) => {
-                        // TODO: Check if error is MongoBulkWriteError: E11000 duplicate key error
-                        // And update all other mutable fields
-                        Citizen.updateMany(
-                            { address: error.errors.address.value },
-                            { ens: 'HA' },
-                            () => {},
-                        );
-                    });
+                    const parsedContractCitizens = await Promise.all(
+                        _citizens.map(async (adr: string) => {
+                            const citizen = await this.badgeContract.getCitizen(
+                                adr,
+                            );
+                            return new Citizen({
+                                address: adr,
+                                ens: '',
+                                opco: citizen.opco,
+                                minted: false,
+                                delegatedTo: null,
+                                votes: { test: 1 },
+                                meta: { test: 2 },
+                            });
+                        }),
+                    );
+                    // Find a better way to skip over errors using batch insertions
+                    for (let i = 0; i < parsedContractCitizens.length; i++) {
+                        try {
+                            await parsedContractCitizens[i].save();
+                        } catch (error) {
+                            console.log({
+                                level: 'error',
+                                info: 'Error saving Citizen',
+                                error: error,
+                            });
+                            if (
+                                error instanceof mongoose.Error.ValidationError
+                            ) {
+                                console.log({
+                                    level: 'info',
+                                    info: 'Add Citizen: Citizen already exists, updating instead...',
+                                });
+                                await OPCO.findOneAndUpdate(
+                                    {
+                                        address:
+                                            parsedContractCitizens[i].address,
+                                    },
+                                    {
+                                        minted: parsedContractCitizens[i]
+                                            .minted, // Update the minted status - IMPROVE ME
+                                    },
+                                ).exec();
+                            }
+                        }
+                    }
                 } catch (error) {
                     console.log({
                         level: 'error',
-                        message: `Citizens set: ${_opco}`,
+                        message: `Citizens Error`,
                         error: error,
                     });
                 }
