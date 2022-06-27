@@ -1,6 +1,6 @@
 import { badgeContract } from '../config/contract.config';
-import { handleOPCOsAdded } from '../handlers/op/opcos.added.handler';
-import { handleCitizensAdded } from '../handlers/opco/citizens.added.handler';
+import { handleOPCOsAdded } from '../handlers/events/opcos.added.handler';
+import { handleCitizensAdded } from '../handlers/events/citizens.added.handler';
 
 export default class ContractEventService {
     private badgeContract = badgeContract;
