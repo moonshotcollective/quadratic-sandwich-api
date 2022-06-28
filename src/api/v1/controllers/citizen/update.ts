@@ -1,7 +1,12 @@
+import Joi from '@hapi/joi';
 import { RequestHandler } from 'express';
 import { customRequestHandler } from '../../middlewares/request.middleware';
 import { Citizen } from '../../models/citizen.model';
 import { validateJWT } from '../../utils/jwt.utils';
+
+const updateCitizenSchema = Joi.object().keys({
+    meta: Joi.object(),
+});
 
 const updateCitizenWrapper: RequestHandler = async (req, res): Promise<void> => {
     try {
@@ -50,4 +55,4 @@ const updateCitizenWrapper: RequestHandler = async (req, res): Promise<void> => 
     }
 };
 
-export const update = customRequestHandler(updateCitizenWrapper);
+export const update = customRequestHandler(updateCitizenWrapper, { validation: {body: updateCitizenSchema}});

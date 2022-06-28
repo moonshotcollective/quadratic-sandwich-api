@@ -1,10 +1,14 @@
+import Joi from '@hapi/joi';
 import { RequestHandler } from 'express';
 import { customRequestHandler } from '../../middlewares/request.middleware';
 import { OPCO } from '../../models/opco.model';
 import { validateJWT } from '../../utils/jwt.utils';
 
+const updateOPCOSchema = Joi.object().keys({
+    meta: Joi.object(),
+});
+
 const updateOPCOWrapper: RequestHandler = async (req, res): Promise<void> => {
-    console.log("moose")
     try {
         let role = 'PUBLIC';
         if (req.headers.authorization) {
@@ -48,7 +52,6 @@ const updateOPCOWrapper: RequestHandler = async (req, res): Promise<void> => {
         });
         res.status(500).send(error);
     }
-    console.log("moose to")
 };
 
-export const update = customRequestHandler(updateOPCOWrapper);
+export const update = customRequestHandler(updateOPCOWrapper, {validation: {body: updateOPCOSchema }});
