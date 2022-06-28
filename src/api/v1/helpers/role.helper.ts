@@ -3,8 +3,8 @@ import { Contract, providers } from 'ethers';
 // must include any fragment we wish to use
 const rolesABI = [
     // View-Only Functions
-    'function isOp(address _adr) public view returns (bool)',
-    'function isOpCo(address _adr) public view returns (bool)',
+    'function isOP(address _adr) public view returns (bool)',
+    'function isOPCO(address _adr) public view returns (bool)',
     'function isCitizen(address _adr) public view returns (bool)',
 ];
 
@@ -14,18 +14,18 @@ const provider = new providers.JsonRpcProvider(rpcUrl);
 
 const badgeContract = new Contract(badgeAddress, rolesABI, provider);
 
-const isOp = async (address: string): Promise<boolean> => {
+const isOP = async (address: string): Promise<boolean> => {
     try {
-        const isOp = await badgeContract.isOp(address);
+        const isOp = await badgeContract.isOP(address);
         return isOp;
     } catch(error) {
         return false;
     }
 }
 
-const isOpCo = async (address: string): Promise<boolean> => {
+const isOPCO = async (address: string): Promise<boolean> => {
     try {
-        const isOp = await badgeContract.isOpCo(address);
+        const isOp = await badgeContract.isOPCO(address);
         return isOp;
     } catch(error) {
         return false;
@@ -42,9 +42,9 @@ const isCitizen = async (address: string): Promise<boolean> => {
 }
 
 export const getRole = async (address: string): Promise<string> => {
-    if (await isOp(address)) {
+    if (await isOP(address)) {
         return "OP_ROLE";
-    } else if (await isOpCo(address)) {
+    } else if (await isOPCO(address)) {
         return "OPCO_ROLE";
     } else if (await isCitizen(address)) {
         return "CITIZEN_ROLE";

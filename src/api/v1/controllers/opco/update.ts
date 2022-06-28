@@ -4,13 +4,14 @@ import { OPCO } from '../../models/opco.model';
 import { validateJWT } from '../../utils/jwt.utils';
 
 const updateOPCOWrapper: RequestHandler = async (req, res): Promise<void> => {
+    console.log("moose")
     try {
         let role = 'PUBLIC';
         if (req.headers.authorization) {
             const decodedToken = await validateJWT(req.headers.authorization);
             role = decodedToken.role;
             // only OP has this access
-            if (role !== 'OPCO') {
+            if (role !== 'OPCO_ROLE') {
                 const error = {
                     name: 'InvalidRole',
                     message: 'Invalid Role Access.',
@@ -47,6 +48,7 @@ const updateOPCOWrapper: RequestHandler = async (req, res): Promise<void> => {
         });
         res.status(500).send(error);
     }
+    console.log("moose to")
 };
 
 export const update = customRequestHandler(updateOPCOWrapper);
