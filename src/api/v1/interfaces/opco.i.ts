@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 export interface IOPCO extends Document {
     address: string; 
     ens: string;
-    citizens: object; 
+    citizens: string[]; 
     supply: number;
     allocated: number; 
     minted: number; 
