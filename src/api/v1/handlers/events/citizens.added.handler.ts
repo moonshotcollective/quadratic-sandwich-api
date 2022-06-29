@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
+import { parse } from 'path';
 import { badgeContract } from '../../config/contract.config';
+import { IOPCO } from '../../interfaces/opco.i';
 import { Citizen } from '../../models/citizen.model';
 import { OPCO } from '../../models/opco.model';
 
@@ -38,19 +40,31 @@ export const handleCitizensAdded = async (
                     info: 'Error saving Citizen',
                     error: error,
                 });
-                if (error instanceof mongoose.Error.ValidationError) { // TODO: more specific error handling
+                if (error instanceof mongoose.Error.ValidationError) {
+                    // TODO: more specific error handling
                     console.log({
                         level: 'info',
                         info: 'Add Citizen: Citizen already exists, updating instead...',
                     });
-                    await OPCO.findOneAndUpdate(
-                        {
-                            address: parsedContractCitizens[i].address,
-                        },
-                        {
-                            minted: parsedContractCitizens[i].minted, // Update the minted status - IMPROVE ME
-                        },
+                    const opcoRes = await OPCO.findOne(
+                        { address: parsedContractCitizens[i].opco },
+                        'citizens',
                     ).exec();
+                    if (opcoRes) {
+                        const citizens = opcoRes?.citizens;
+                        await OPCO.findOneAndUpdate(
+                            {
+                                address: parsedContractCitizens[i].opco,
+                            },
+                            {
+                                citizens: [
+                                    ...citizens,
+                                    parsedContractCitizens[i]?.address,
+                                ],
+                                minted: parsedContractCitizens[i].minted, // Update the minted status - IMPROVE ME
+                            },
+                        ).exec();
+                    }
                 }
             }
         }
