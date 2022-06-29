@@ -15,7 +15,7 @@ const updateCitizenWrapper: RequestHandler = async (req, res): Promise<void> => 
             const decodedToken = await validateJWT(req.headers.authorization);
             role = decodedToken.role;
             // only OP has this access
-            if (role !== 'CITIZEN') { // OPCO TOO? 
+            if (role !== 'CITIZEN_ROLE') { // OPCO TOO? 
                 const error = {
                     name: 'InvalidRole',
                     message: 'Invalid Role Access.',

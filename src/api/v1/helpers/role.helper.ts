@@ -16,8 +16,8 @@ const badgeContract = new Contract(badgeAddress, rolesABI, provider);
 
 const isOP = async (address: string): Promise<boolean> => {
     try {
-        const isOp = await badgeContract.isOP(address);
-        return isOp;
+        const isOP = await badgeContract.isOP(address);
+        return isOP;
     } catch(error) {
         return false;
     }
@@ -25,8 +25,8 @@ const isOP = async (address: string): Promise<boolean> => {
 
 const isOPCO = async (address: string): Promise<boolean> => {
     try {
-        const isOp = await badgeContract.isOPCO(address);
-        return isOp;
+        const isOPCO = await badgeContract.isOPCO(address);
+        return isOPCO;
     } catch(error) {
         return false;
     }
@@ -34,8 +34,8 @@ const isOPCO = async (address: string): Promise<boolean> => {
 
 const isCitizen = async (address: string): Promise<boolean> => {
     try {
-        const isOp = await badgeContract.isCitizen(address);
-        return isOp;
+        const isCitizen = await badgeContract.isCitizen(address);
+        return isCitizen;
     } catch(error) {
         return false;
     }
