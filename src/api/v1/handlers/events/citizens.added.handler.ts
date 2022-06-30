@@ -33,7 +33,28 @@ export const handleCitizensAdded = async (
         // Find a better way to skip over errors using batch insertions
         for (let i = 0; i < parsedContractCitizens.length; i++) {
             try {
+                // Save the citizen 
                 await parsedContractCitizens[i].save();
+                // Update the OPCO with the citizen
+                const opcoRes = await OPCO.findOne(
+                    { address: parsedContractCitizens[i].opco },
+                    'citizens',
+                ).exec();
+                if (opcoRes) {
+                    const citizens = opcoRes?.citizens;
+                    await OPCO.findOneAndUpdate(
+                        {
+                            address: parsedContractCitizens[i].opco,
+                        },
+                        {
+                            citizens: [
+                                ...citizens,
+                                parsedContractCitizens[i]?.address,
+                            ],
+                            minted: parsedContractCitizens[i].minted, // Update the minted status - IMPROVE ME
+                        },
+                    ).exec();
+                }
             } catch (error) {
                 console.log({
                     level: 'error',
