@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { parse } from 'path';
-import { badgeContract } from '../../config/contract.config';
+import { badgeContract, mainnetProvider, provider } from '../../config/contract.config';
 import { IOPCO } from '../../interfaces/opco.i';
 import { Citizen } from '../../models/citizen.model';
 import { OPCO } from '../../models/opco.model';
@@ -19,9 +19,10 @@ export const handleCitizensAdded = async (
         const parsedContractCitizens = await Promise.all(
             _citizens.map(async (adr: string) => {
                 const citizen = await badgeContract.getCitizen(adr);
+                const ens = await mainnetProvider.lookupAddress(adr);
                 return new Citizen({
                     address: adr,
-                    ens: '',
+                    ens: ens,
                     opco: citizen.opco,
                     minted: false,
                     delegatedTo: null,
