@@ -8,6 +8,7 @@ export interface ICitizen extends Document {
     delegatedTo: string; 
     votes: object; // TODO: Define voting interface
     meta: object; // TODO: Define citizen metadata interface
+    onboard: number; 
 }
 
 

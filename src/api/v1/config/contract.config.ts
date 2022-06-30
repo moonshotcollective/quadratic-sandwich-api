@@ -1,7 +1,7 @@
 import { providers, Contract } from "ethers";
 
-const provider = new providers.JsonRpcProvider(process.env.RPC_ENDPOINT);
-const mainnetProvider = new providers.JsonRpcProvider(
+export const provider = new providers.JsonRpcProvider(process.env.RPC_ENDPOINT);
+export const mainnetProvider = new providers.JsonRpcProvider(
     process.env.MAINNET_RPC_ENDPOINT,
 );
 const badgeAddress = process.env.CONTRACT_ADDRESS

@@ -28,6 +28,7 @@ export const handleCitizensAdded = async (
                     delegatedTo: null,
                     votes: { test: 1 },
                     meta: { test: 2 },
+                    onboard: 0,
                 });
             }),
         );

@@ -6,6 +6,7 @@ import { validateJWT } from '../../utils/jwt.utils';
 
 const updateCitizenSchema = Joi.object().keys({
     meta: Joi.object(),
+    onboard: Joi.number(),
 });
 
 const updateCitizenWrapper: RequestHandler = async (req, res): Promise<void> => {

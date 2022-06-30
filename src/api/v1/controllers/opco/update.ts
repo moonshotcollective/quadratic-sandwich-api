@@ -6,6 +6,7 @@ import { validateJWT } from '../../utils/jwt.utils';
 
 const updateOPCOSchema = Joi.object().keys({
     meta: Joi.object(),
+    onboard: Joi.number(),
 });
 
 const updateOPCOWrapper: RequestHandler = async (req, res): Promise<void> => {
