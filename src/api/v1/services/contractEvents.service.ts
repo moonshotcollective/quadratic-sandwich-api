@@ -1,6 +1,7 @@
 import { badgeContract } from '../config/contract.config';
 import { handleOPCOsAdded } from '../handlers/events/opcos.added.handler';
 import { handleCitizensAdded } from '../handlers/events/citizens.added.handler';
+import { handleMinted } from '../handlers/events/minted.handler';
 
 export default class ContractEventService {
     private badgeContract = badgeContract;
@@ -16,6 +17,7 @@ export default class ContractEventService {
     async initializeContractEventService() {
         this.addCitizensEventHandler();
         this.addOPCOsEventHandler();
+        this.mintedEventHandler();
     }
 
     private addOPCOsEventHandler() {
@@ -33,5 +35,12 @@ export default class ContractEventService {
             'CitizensAdded',
             handleCitizensAdded
         );
+    }
+
+    private mintedEventHandler() {
+        this.badgeContract.on(
+            'Minted', 
+            handleMinted
+        )
     }
 }
