@@ -11,6 +11,7 @@ export const addCitizenSchema = Joi.object().keys({
     delegatedTo: Joi.string(),
     votes: Joi.object(),
     meta: Joi.object(),
+    onboard: Joi.number(),
 });
 
 const addCitizenWrapper: RequestHandler = async (req, res) => {
