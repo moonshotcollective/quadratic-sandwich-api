@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 import { parse } from 'path';
-import { badgeContract, mainnetProvider, provider } from '../../config/contract.config';
+import {
+    badgeContract,
+    mainnetProvider,
+    provider,
+} from '../../config/contract.config';
 import { IOPCO } from '../../interfaces/opco.i';
 import { Citizen } from '../../models/citizen.model';
 import { OPCO } from '../../models/opco.model';
@@ -35,15 +39,23 @@ export const handleCitizensAdded = async (
         // Find a better way to skip over errors using batch insertions
         for (let i = 0; i < parsedContractCitizens.length; i++) {
             try {
-                // Save the citizen 
+                // Save the citizen
                 await parsedContractCitizens[i].save();
                 // Update the OPCO with the citizen
-                const opcoRes = await OPCO.findOne(
-                    { address: parsedContractCitizens[i].opco },
-                    'citizens',
-                ).exec();
+                const opcoRes = await OPCO.findOne({
+                    address: parsedContractCitizens[i].opco,
+                }).exec();
                 if (opcoRes) {
                     const citizens = opcoRes?.citizens;
+                    let onboard = 0;
+                    if (
+                        citizens.length > 0 &&
+                        citizens.length < opcoRes.supply
+                    ) {
+                        onboard = 2;
+                    } else if (citizens.length === opcoRes.supply) {
+                        onboard = 3;
+                    }
                     await OPCO.findOneAndUpdate(
                         {
                             address: parsedContractCitizens[i].opco,
@@ -54,6 +66,7 @@ export const handleCitizensAdded = async (
                                 parsedContractCitizens[i]?.address,
                             ],
                             minted: parsedContractCitizens[i].minted, // Update the minted status - IMPROVE ME
+                            onboard: onboard,
                         },
                     ).exec();
                 }
@@ -69,10 +82,9 @@ export const handleCitizensAdded = async (
                         level: 'info',
                         info: 'Add Citizen: Citizen already exists, updating instead...',
                     });
-                    const opcoRes = await OPCO.findOne(
-                        { address: parsedContractCitizens[i].opco },
-                        'citizens',
-                    ).exec();
+                    const opcoRes = await OPCO.findOne({
+                        address: parsedContractCitizens[i].opco,
+                    }).exec();
                     if (opcoRes) {
                         const citizens = opcoRes?.citizens;
                         await OPCO.findOneAndUpdate(
