@@ -47,13 +47,8 @@ export const handleCitizensAdded = async (
                 }).exec();
                 if (opcoRes) {
                     const citizens = opcoRes?.citizens;
-                    let onboard = 0;
-                    if (
-                        citizens.length > 0 &&
-                        citizens.length < opcoRes.supply
-                    ) {
-                        onboard = 2;
-                    } else if (citizens.length === opcoRes.supply) {
+                    let onboard = 2;
+                    if (citizens.length === opcoRes.supply) {
                         onboard = 3;
                     }
                     await OPCO.findOneAndUpdate(
