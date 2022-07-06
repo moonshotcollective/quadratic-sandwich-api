@@ -38,7 +38,13 @@ const updateOPCOWrapper: RequestHandler = async (req, res): Promise<void> => {
         }
 
         const query = { address: req.query.address };
-        const update = req.body;
+        const update = req.body; 
+        // const update = {
+        //     name: req.body.name, 
+        //     description: req.body.description, 
+        //     profileImg: req.file,
+        //     headerImg: req.file,
+        // };
 
         const opco = await OPCO.findOneAndUpdate(query, update, {
             new: true,
