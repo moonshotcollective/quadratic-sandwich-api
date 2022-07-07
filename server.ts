@@ -45,7 +45,7 @@ const dbConnection = new MongoConnection(
 );
 
 // Establish Express API
-const app: Application = express();
+export const app: Application = express();
 const server: Server = new Server(app);
 const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
 const host: string = '0.0.0.0';

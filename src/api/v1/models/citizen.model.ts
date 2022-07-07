@@ -16,6 +16,18 @@ const citizenSchema = new Schema({
 });
 
 citizenSchema.plugin(uniqueValidator);
+
+// Function to handle Error code 11000 for duplicate entries
+const handleError11000 = (error: any, doc: any, next: any) => {
+    if (error.name === 'MongoError' && error.code === 11000) {
+        next(new Error('There was a duplicate entry'));
+    } else {
+        next(error);
+    }
+}
+
+citizenSchema.post('save', handleError11000);
+
 // citizenSchema.post('save', (error: any, doc: any, next: any) => {
 //     console.log("HEYYYYYYYYYYYYYYYY\n");
 //     if (error.name === 'MongoServerError' && error.code === 11000) {
