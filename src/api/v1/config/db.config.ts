@@ -45,9 +45,10 @@ export default class MongoConnection {
     }
 
     /** Start mongo connection */
-    public connect(onConnectedCallback: IOnConnectedCallback) {
+    public connect(onConnectedCallback: IOnConnectedCallback): mongoose.Connection {
         this.onConnectedCallback = onConnectedCallback;
         this.startConnection();
+        return mongoose.connection;
     }
 
     private startConnection = () => {

@@ -12,6 +12,7 @@ import { GridFsStorage } from 'multer-gridfs-storage';
 import { randomBytes } from 'crypto';
 import path from 'path';
 import multer from 'multer';
+import mongoose, { connect } from 'mongoose';
 
 // Establish the image storage engine
 const storage = new GridFsStorage({
@@ -40,12 +41,13 @@ const upload = multer({ storage });
 const contractEventService = new ContractEventService();
 
 // Establish the DB connection
-const dbConnection = new MongoConnection(
+export const dbConnection = new MongoConnection(
     process.env.MONGO_URI ? process.env.MONGO_URI : '', // FIXME: Add fallback URI
 );
 
+
 // Establish Express API
-export const app: Application = express();
+const app: Application = express();
 const server: Server = new Server(app);
 const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
 const host: string = '0.0.0.0';
@@ -73,7 +75,7 @@ dbConnection.connect((): void => {
 // Close the Mongoose connection, when receiving SIGINT
 process.on('SIGINT', (): void => {
     console.info('\nGracefully shutting down');
-    dbConnection.close(err => {
+    dbConnection.close((err: any) => {
         if (err) {
             console.log({
                 level: 'error',

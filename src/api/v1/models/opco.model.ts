@@ -7,7 +7,7 @@ interface IOPCOModel extends Model<IOPCO> {}
 const opcoSchema = new Schema({
     address: { type: String, required: true, unique: true },
     ens: { type: String },
-    citizens: {type: Object },
+    citizens: {type: Array },
     supply: { type: Number },
     allocated: {type: Number }, 
     minted: { type: Number }, 
