@@ -1,7 +1,7 @@
 // test updating a citizen
-import * as dbHandler from './setup';
+import * as dbHandler from './../setup';
 import request from 'supertest';
-import app from '../src/api/v1/app';
+import app from './../../src/api/v1/app';
 
 beforeAll(async () => {
     await dbHandler.connect();
@@ -24,8 +24,8 @@ const close = async (): Promise<boolean> => {
     return true;
 };
 
-describe('POST', () => {
-    describe('/login', () => {
+describe('/login', () => {
+    describe('POST', () => {
         it('should login with address and signature', async () => {
             const result = await request(app)
                 .post(`/api/${process.env.API_VERSION}/login`)
@@ -83,8 +83,4 @@ describe('POST', () => {
         });
     });
 
-    // test citizens post reqs 
-    // describe('/citizen', () => {
-
-    // });
 });

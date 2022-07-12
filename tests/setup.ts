@@ -8,6 +8,10 @@ import mongoose, {  } from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import MongoConnection from '../src/api/v1/config/db.config';
 import app from '../src/api/v1/app';
+import { getRole } from '../src/api/v1/helpers/role.helper';
+import { IEthLoginRequest } from '../src/api/v1/interfaces/ethLoginRequest.i';
+import { ITokenPayload } from '../src/api/v1/interfaces/tokenPayload.i';
+import { sign, SignOptions, verify, VerifyOptions, Secret } from 'jsonwebtoken';
 
 
 /**
@@ -51,3 +55,25 @@ export const clearDatabase = async () => {
         await collection.deleteMany({});
     }
 }
+
+export const generateFakeJWT = async (loginRequest: IEthLoginRequest, role: string) => {
+    // Fallback to PUBLIC role if fails
+    console.log(await getRole(loginRequest.address));
+
+    const payload: ITokenPayload = {
+        address: loginRequest.address,
+        signature: loginRequest.signature,
+        role: role,
+    };
+
+    const privateKey: Secret = process.env.SIGNATURE_SECRET
+        ? process.env.SIGNATURE_SECRET
+        : 'SECRET';
+
+    const signInOptions: SignOptions = {
+        algorithm: 'HS256',
+        expiresIn: '1h',
+    };
+
+    return sign(payload, privateKey, signInOptions);
+};

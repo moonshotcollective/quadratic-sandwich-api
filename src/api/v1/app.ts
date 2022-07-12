@@ -16,9 +16,5 @@ app.use(helmet()); // Use Helmet for security
 app.disable('x-powered-by'); // Reduce fingerprinting
 
 
-app.get('/', (req, res) => {
-    res.send({ greeting: 'Hello World!' });
-});
-
 setupRoutes(app);
 export default app;
