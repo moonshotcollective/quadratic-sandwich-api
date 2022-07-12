@@ -5,7 +5,7 @@ if (env.error) {
 }
 import express from 'express';
 import { Application } from 'express';
-import Server from './src/api/v1/index';
+import CitizenHouseApp from './src/api/v1/app';
 import ContractEventService from './src/api/v1/services/contractEvents.service';
 import MongoConnection from './src/api/v1/config/db.config';
 import { GridFsStorage } from 'multer-gridfs-storage';
@@ -14,68 +14,41 @@ import path from 'path';
 import multer from 'multer';
 import mongoose, { connect } from 'mongoose';
 
-// Establish the image storage engine
-const storage = new GridFsStorage({
-    url: process.env.MONGO_URI ? process.env.MONGO_URI : '',
-    file: (req, file) => {
-        return new Promise((resolve, reject) => {
-            randomBytes(16, (err, buf) => {
-                if (err) {
-                    return reject(err);
-                }
-                const filename = `${buf.toString('hex')}${path.extname(
-                    file.originalname,
-                )}`;
-                const fileinfo = {
-                    filename: filename,
-                    bucketName: 'imageUploads',
-                };
-                resolve(fileinfo);
-            });
-        });
-    },
-});
-const upload = multer({ storage });
+import app from './src/api/v1/app';
 
-// Establish the Contract Services
-const contractEventService = new ContractEventService();
-
-// Establish the DB connection
-export const dbConnection = new MongoConnection(
-    process.env.MONGO_URI ? process.env.MONGO_URI : '', // FIXME: Add fallback URI
-);
-
-
-// Establish Express API
-const app: Application = express();
-const server: Server = new Server(app);
-const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
-const host: string = '0.0.0.0';
-
-// Start the Application
-dbConnection.connect((): void => {
-    app.listen(port, host, (): void => {
-        console.log({
-            level: 'info',
-            message: `🌏 Express server started on http://${host}:${port}`,
-        });
-    }).on('error', (err: any): void => {
-        if (err.code === 'EADDRINUSE') {
-            console.log({
-                level: 'error',
-                message: 'Server startup error: address already in use',
-                error: err,
-            });
-        } else {
-            console.log(err);
-        }
+const host = process.env.HOST || 'localhost';
+const port = process.env.PORT || '62562';
+let dbConn: MongoConnection;
+app.listen(port, () => {
+    console.log({
+        level: 'info',
+        message: `🌏 Express server started on http://${host}:${port}`,
     });
+
+    // Establish the Contract Services
+    new ContractEventService();
+
+    // Establish the DB connection
+    dbConn = new MongoConnection(
+        process.env.MONGO_URI ? process.env.MONGO_URI : '', // FIXME: Add fallback URI
+    );
+    dbConn.connect(() => {});
+}).on('error', (err: any): void => {
+    if (err.code === 'EADDRINUSE') {
+        console.log({
+            level: 'error',
+            message: 'Server startup error: address already in use',
+            error: err,
+        });
+    } else {
+        console.log(err);
+    }
 });
 
 // Close the Mongoose connection, when receiving SIGINT
 process.on('SIGINT', (): void => {
     console.info('\nGracefully shutting down');
-    dbConnection.close((err: any) => {
+    dbConn.close((err: any) => {
         if (err) {
             console.log({
                 level: 'error',
@@ -86,3 +59,25 @@ process.on('SIGINT', (): void => {
         process.exit(0);
     });
 });
+// // Establish the image storage engine
+// const storage = new GridFsStorage({
+//     url: process.env.MONGO_URI ? process.env.MONGO_URI : '',
+//     file: (req, file) => {
+//         return new Promise((resolve, reject) => {
+//             randomBytes(16, (err, buf) => {
+//                 if (err) {
+//                     return reject(err);
+//                 }
+//                 const filename = `${buf.toString('hex')}${path.extname(
+//                     file.originalname,
+//                 )}`;
+//                 const fileinfo = {
+//                     filename: filename,
+//                     bucketName: 'imageUploads',
+//                 };
+//                 resolve(fileinfo);
+//             });
+//         });
+//     },
+// });
+// const upload = multer({ storage });
