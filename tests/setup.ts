@@ -1,16 +1,19 @@
 // mock db setup
-import mongoose, { Mongoose, MongooseOptions } from 'mongoose';
+import * as dotenv from 'dotenv';
+const env = dotenv.config();
+if (env.error) {
+    dotenv.config({ path: '.env' });
+}
+import mongoose, {  } from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import express, { Application } from 'express';
 import MongoConnection from '../src/api/v1/config/db.config';
-import Server from '../src/api/v1';
+import app from '../src/api/v1/app';
 
 
 /**
  * Connect to mock memory db.
  */
-export const app = express();
-export const server = new Server(app);
+export const citizenHouseApp = app;
 let mongod: MongoMemoryServer;
 let configuredDb: MongoConnection;
 let dbConn: mongoose.Connection;
@@ -20,13 +23,12 @@ export const connect = async () => {
     mongod = await MongoMemoryServer.create();
     const uri = await mongod.getUri();
     configuredDb = new MongoConnection(uri);
-    dbConn = await configuredDb.connect(
-       startServer  
-    );
+    dbConn = await configuredDb.connect(() => {}); 
 }
 
 export const closeConnection = async () => {
-    serverConn.close();
+    // await serverConn.close();
+
 }
 
 /**
@@ -48,13 +50,4 @@ export const clearDatabase = async () => {
         const collection = collections[key];
         await collection.deleteMany({});
     }
-}
-
-export const startServer = () => {
-        serverConn = app.listen(8080, (): void => {
-            console.log({
-                level: 'info',
-                message: `🌏 Express server started on http://localhost:8080`,
-            }); 
-        })
 }
