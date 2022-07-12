@@ -28,7 +28,7 @@ const updateOPCOWrapper: RequestHandler = async (req, res): Promise<void> => {
                     name: 'InvalidAddress',
                     message: 'Invalid address param.',
                 };
-                res.status(401).send(error);
+                res.status(400).send(error);
             }
         } else {
             throw {
@@ -57,7 +57,7 @@ const updateOPCOWrapper: RequestHandler = async (req, res): Promise<void> => {
             message: 'Error: Update OPCO failed.',
             error: error,
         });
-        res.status(500).send(error);
+        res.status(400);
     }
 };
 
