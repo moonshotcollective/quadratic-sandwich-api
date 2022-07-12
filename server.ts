@@ -3,16 +3,8 @@ const env = dotenv.config();
 if (env.error) {
     dotenv.config({ path: '.env' });
 }
-import express from 'express';
-import { Application } from 'express';
-import CitizenHouseApp from './src/api/v1/app';
 import ContractEventService from './src/api/v1/services/contractEvents.service';
 import MongoConnection from './src/api/v1/config/db.config';
-import { GridFsStorage } from 'multer-gridfs-storage';
-import { randomBytes } from 'crypto';
-import path from 'path';
-import multer from 'multer';
-import mongoose, { connect } from 'mongoose';
 
 import app from './src/api/v1/app';
 
